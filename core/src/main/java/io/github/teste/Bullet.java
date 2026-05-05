@@ -14,6 +14,7 @@ public class Bullet implements Pool.Poolable{
     public Bullet() {
         this.position = new Vector2();
         this.alive = false;
+
     }
     public void init(float posX, float posY) {
         position.set(posX, posY);
@@ -47,5 +48,13 @@ public class Bullet implements Pool.Poolable{
 
     public Vector2 getPosition() {
         return position;
+    }
+
+    public Sound getSom() {
+        return Som;
+    }
+
+    public void setSom(Sound som) {
+        Som = som;
     }
 }

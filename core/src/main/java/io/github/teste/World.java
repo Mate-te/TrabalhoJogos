@@ -82,8 +82,8 @@ public class World {
         Bullet bullet = bulletPool.obtain();
         bullet.init(x, y);
         activeBullets.add(bullet);
-        Sound som = manager.get("data/PIU.wav", Sound.class);
-        som.play();
+        bullet.setSom(manager.get("data/PIU.wav", Sound.class));
+        bullet.getSom().play();
     }
 
     private void checkCollisions() {
