@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.Gdx;
 
-
 public class World {
 
     private final Array<Bullet> activeBullets = new Array<Bullet>();
@@ -26,13 +25,20 @@ public class World {
         }
     };
     private AssetManager manager;
+    private Hero hero; // Novo campo para encapsular o cowboy
+
+    public float alienSpawnTimer = 0.5f;
+    public float alienSpawnInterval = 0.5f;
+
     public World(AssetManager manager) {
         this.manager = manager;
+        // Inicializa o herói (cowboy) com o som de morte e posição inicial
+        Sound deathSound = manager.get("data/morte.wav", Sound.class);
+        this.hero = new Hero(deathSound);
+        this.hero.init(0, Gdx.graphics.getHeight() / 2); // Posiciona na esquerda, altura central
     }
 
-    private float alienSpawnTimer = 0.5f;
-    private float alienSpawnInterval = 0.5f; // segundos
-    private float cowboyY;
+    // Removido: private float cowboyY; (agora vem do hero)
 
     public void update(float delta) {
         alienSpawnTimer += delta;
@@ -50,6 +56,9 @@ public class World {
         for (Alien alien : activeAliens) {
             alien.update(delta);
         }
+
+        // Novo: Atualiza o herói
+        hero.update(delta);
 
         // Remove balas mortas
         for (int i = activeBullets.size; --i >= 0;) {
@@ -74,7 +83,7 @@ public class World {
 
     private void spawnAlien() {
         Alien alien = alienPool.obtain();
-        alien.init(Gdx.graphics.getWidth(), cowboyY);
+        alien.init(Gdx.graphics.getWidth(), hero.getPosition().y); // Usa a posição Y do herói
         activeAliens.add(alien);
     }
 
@@ -87,6 +96,7 @@ public class World {
     }
 
     private void checkCollisions() {
+        // Colisões bala vs alien (mantém igual)
         for (int i = activeBullets.size; --i >= 0;) {
             Bullet bullet = activeBullets.get(i);
             for (int j = activeAliens.size; --j >= 0;) {
@@ -95,6 +105,15 @@ public class World {
                     bullet.setAlive(false);
                     alien.setAlive(false);
                 }
+            }
+        }
+
+        // Novo: Colisões alien vs herói
+        for (int j = activeAliens.size; --j >= 0;) {
+            Alien alien = activeAliens.get(j);
+            if (hero.isAlive() && hero.getPosition().dst(alien.getPosition()) < 50) { // assume raio 50
+                hero.die(); // Mata o herói e toca som
+                // Opcional: Aqui você pode adicionar lógica para game over, ex: parar o jogo
             }
         }
     }
@@ -107,7 +126,10 @@ public class World {
         return activeAliens;
     }
 
-    public void setCowboyY(float y) {
-        cowboyY = y;
+    // Novo: Getter para acessar o herói (útil para renderização em GameScreen)
+    public Hero getHero() {
+        return hero;
     }
+
+    // Removido: public void setCowboyY(float y) (não precisa mais)
 }
