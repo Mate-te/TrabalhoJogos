@@ -28,9 +28,10 @@ public class GameScreen implements Screen {
         alien = manager.get("demo.png", Texture.class);
         bullet = manager.get("bullet.png", Texture.class);
         manager.load("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
+        manager.load("data/morte.wav", com.badlogic.gdx.audio.Sound.class);
         manager.finishLoading();
         world = new World(manager);
-        world.setCowboyY((float) Gdx.graphics.getHeight() / 2.0f - (float) cowboy.getHeight() / 2.0f);
+        world.getHero().setPosition(50, (float) Gdx.graphics.getHeight() / 2.0f - (float) cowboy.getHeight() / 2.0f);
     }
 
     @Override
@@ -42,18 +43,17 @@ public class GameScreen implements Screen {
 
         world.update(delta);
 
-        // Detecta clique
         if (Gdx.input.justTouched()) {
-            float cowboyX = 50;
-            float cowboyY = (float) Gdx.graphics.getHeight() / 2.0f - (float) cowboy.getHeight() / 2.0f;
-            world.shoot(cowboyX + cowboy.getWidth(), cowboyY + (float) cowboy.getHeight() / 2.0f);
+            float shootX = world.getHero().getPosition().x + cowboy.getWidth();
+            float shootY = world.getHero().getPosition().y + (float) cowboy.getHeight() / 2.0f;
+            world.shoot(shootX, shootY);
         }
 
         batch.begin();
         batch.draw(fundo, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        float cowboyX = 50;
-        float cowboyY = (float) Gdx.graphics.getHeight() / 2.0f - (float) cowboy.getHeight() / 2.0f;
-        batch.draw(cowboy, cowboyX, cowboyY);
+        if (world.getHero().isAlive()) {
+            batch.draw(cowboy, world.getHero().getPosition().x, world.getHero().getPosition().y);
+        }
 
         for (Bullet b : world.getActiveBullets()) {
             batch.draw(bullet, b.getPosition().x, b.getPosition().y);
