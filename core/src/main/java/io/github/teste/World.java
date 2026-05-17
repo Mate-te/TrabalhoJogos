@@ -1,11 +1,9 @@
 package io.github.teste;
+
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.utils.ScreenUtils;
-import jdk.javadoc.internal.doclets.formats.html.markup.Text;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.Gdx;
 
 public class World {
@@ -24,21 +22,19 @@ public class World {
             return new Alien();
         }
     };
+
     private AssetManager manager;
-    private Hero hero; // Novo campo para encapsular o cowboy
+    private Hero hero;
 
     public float alienSpawnTimer = 0.5f;
     public float alienSpawnInterval = 0.5f;
 
-    public World(AssetManager manager) {
+    public World(AssetManager manager, Hero hero) {
         this.manager = manager;
-        // Inicializa o herói (cowboy) com o som de morte e posição inicial
-        Sound deathSound = manager.get("data/morte.wav", Sound.class);
-        this.hero = new Hero(deathSound);
-        this.hero.init(0, Gdx.graphics.getHeight() / 2); // Posiciona na esquerda, altura central
+        this.hero = hero;
+        // Posiciona na esquerda, altura central
+        this.hero.init(0, Gdx.graphics.getHeight() / 2f);
     }
-
-    // Removido: private float cowboyY; (agora vem do hero)
 
     public void update(float delta) {
         alienSpawnTimer += delta;
@@ -57,7 +53,7 @@ public class World {
             alien.update(delta);
         }
 
-        // Novo: Atualiza o herói
+        // Atualiza o herói
         hero.update(delta);
 
         // Remove balas mortas
@@ -83,7 +79,8 @@ public class World {
 
     private void spawnAlien() {
         Alien alien = alienPool.obtain();
-        alien.init(Gdx.graphics.getWidth(), hero.getPosition().y); // Usa a posição Y do herói
+        // Usa a posição Y do herói
+        alien.init(Gdx.graphics.getWidth(), hero.getPosition().y);
         activeAliens.add(alien);
     }
 
@@ -91,29 +88,33 @@ public class World {
         Bullet bullet = bulletPool.obtain();
         bullet.init(x, y);
         activeBullets.add(bullet);
-        bullet.setSom(manager.get("data/PIU.wav", Sound.class));
-        bullet.getSom().play();
+
+        // Verifica se o som foi carregado e toca
+        if (manager.isLoaded("data/PIU.wav", com.badlogic.gdx.audio.Sound.class)) {
+            com.badlogic.gdx.audio.Sound s = manager.get("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
+            bullet.setSom(s);
+            if (s != null) s.play();
+        }
     }
 
     private void checkCollisions() {
-        // Colisões bala vs alien (mantém igual)
+        // Colisões bala vs alien
         for (int i = activeBullets.size; --i >= 0;) {
             Bullet bullet = activeBullets.get(i);
             for (int j = activeAliens.size; --j >= 0;) {
                 Alien alien = activeAliens.get(j);
-                if (bullet.getPosition().dst(alien.getPosition()) < 50) { // assume raio 50
+                if (bullet.getPosition().dst(alien.getPosition()) < 50) {
                     bullet.setAlive(false);
                     alien.setAlive(false);
                 }
             }
         }
 
-        // Novo: Colisões alien vs herói
+        // Colisões alien vs herói
         for (int j = activeAliens.size; --j >= 0;) {
             Alien alien = activeAliens.get(j);
-            if (hero.isAlive() && hero.getPosition().dst(alien.getPosition()) < 50) { // assume raio 50
-                hero.die(); // Mata o herói e toca som
-                // Opcional: Aqui você pode adicionar lógica para game over, ex: parar o jogo
+            if (hero.isAlive() && hero.getPosition().dst(alien.getPosition()) < 50) {
+                hero.die();
             }
         }
     }
@@ -126,10 +127,7 @@ public class World {
         return activeAliens;
     }
 
-    // Novo: Getter para acessar o herói (útil para renderização em GameScreen)
     public Hero getHero() {
         return hero;
     }
-
-    // Removido: public void setCowboyY(float y) (não precisa mais)
 }

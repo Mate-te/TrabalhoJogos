@@ -4,7 +4,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Game;
@@ -18,20 +17,50 @@ public class GameScreen implements Screen {
     private Texture cowboy;
     private Texture bullet;
     private World world;
+    private Hero hero;
+    private HeroInputManager heroInputManager;
 
     public GameScreen(Game game, AssetManager manager) {
         this.game = game;
         this.manager = manager;
-        batch = new SpriteBatch();
+
+        manager.load("fundojpeg.jpeg", Texture.class);
+        manager.load("batman.png", Texture.class);
+        manager.load("demo.png", Texture.class);
+        manager.load("bullet.png", Texture.class);
+
         fundo = manager.get("fundojpeg.jpeg", Texture.class);
-        cowboy = manager.get("batman.png", Texture.class);
         alien = manager.get("demo.png", Texture.class);
+        cowboy = manager.get("batman.png", Texture.class);
         bullet = manager.get("bullet.png", Texture.class);
+        batch = new SpriteBatch();
+
+
         manager.load("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
         manager.load("data/morte.wav", com.badlogic.gdx.audio.Sound.class);
         manager.finishLoading();
-        world = new World(manager);
-        world.getHero().setPosition(50, (float) Gdx.graphics.getHeight() / 2.0f - (float) cowboy.getHeight() / 2.0f);
+
+        // Obtem sons
+        com.badlogic.gdx.audio.Sound shootSound = manager.get("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
+        com.badlogic.gdx.audio.Sound deathSound = manager.get("data/morte.wav", com.badlogic.gdx.audio.Sound.class);
+
+        // Cria o herói
+        hero = new Hero(deathSound);
+
+        // Cria o mundo
+        world = new World(manager, hero);
+
+        // Posiciona o herói
+        hero.setPosition(50, (float) Gdx.graphics.getHeight() / 2.0f - cowboy.getHeight() / 2.0f);
+
+        // Cria o gerenciador de input do herói
+        heroInputManager = new HeroInputManager(hero, world, cowboy);
+
+        // Injeta o gerenciador no herói
+        hero.setInputManager(heroInputManager);
+
+        // Registra o gerenciador de input como InputProcessor
+        Gdx.input.setInputProcessor(heroInputManager);
     }
 
     @Override
@@ -43,14 +72,9 @@ public class GameScreen implements Screen {
 
         world.update(delta);
 
-        if (Gdx.input.justTouched()) {
-            float shootX = world.getHero().getPosition().x + cowboy.getWidth();
-            float shootY = world.getHero().getPosition().y + (float) cowboy.getHeight() / 2.0f;
-            world.shoot(shootX, shootY);
-        }
-
         batch.begin();
         batch.draw(fundo, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
         if (world.getHero().isAlive()) {
             batch.draw(cowboy, world.getHero().getPosition().x, world.getHero().getPosition().y);
         }

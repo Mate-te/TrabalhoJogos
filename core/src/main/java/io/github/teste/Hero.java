@@ -7,6 +7,7 @@ public class Hero {
     private Vector2 position;
     private boolean alive;
     private Sound deathSound;
+    private HeroInputManager inputManager; // Variável para gerenciar input
 
     public Hero(Sound deathSound) {
         this.position = new Vector2();
@@ -20,7 +21,7 @@ public class Hero {
     }
 
     public void update(float delta) {
-        // Cowboy é estacionário, então update pode ser vazio ou adicionar lógica futura (ex: animação)
+        // Cowboy é estacionário até o momento
     }
 
     public void die() {
@@ -42,5 +43,13 @@ public class Hero {
 
     public void setPosition(float x, float y) {
         position.set(x, y);
+    }
+
+    public void setInputManager(HeroInputManager inputManager) {
+        this.inputManager = inputManager;
+    }
+
+    public HeroInputManager getInputManager() {
+        return inputManager;
     }
 }
