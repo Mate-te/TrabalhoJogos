@@ -12,6 +12,7 @@ public class World {
     private Texture alienTexture;
     private final Array<Bullet> activeBullets = new Array<Bullet>();
     private final Array<Alien> activeAliens = new Array<Alien>();
+
     private final Pool<Bullet> bulletPool = new Pool<Bullet>() {
         @Override
         protected Bullet newObject() {
@@ -28,22 +29,38 @@ public class World {
     private AssetManager manager;
     private Hero hero;
 
-    public float alienSpawnTimer = 0.5f;
-    public float alienSpawnInterval = 0.5f;
+    // timers
+    private float alienSpawnTimer = 0f;
+    private float elapsedTime = 0f;
+
+    // dificuldade
+    private final float initialAlienSpawnInterval = 0.8f; // intervalo inicial (s) — ajuste aqui
+    private final float minAlienSpawnInterval = 0.5f;    // intervalo mínimo (s) — ajuste se quiser
+    private final float timeToReachMin = 60f;             // segundos para diminuir até o mínimo
+    private final float spawnDecreaseRate = (initialAlienSpawnInterval - minAlienSpawnInterval) / timeToReachMin;
 
     public World(AssetManager manager, Hero hero) {
         this.manager = manager;
         this.hero = hero;
         this.alienTexture = manager.get("demo.png", Texture.class);
         this.bulletTexture = manager.get("bullet.png", Texture.class);
-        this.hero.init(0, Gdx.graphics.getHeight() / 2f);
+        // Não é obrigatório inicializar a posição do hero aqui se depois o GameScreen posiciona.
+        // this.hero.init(0, Gdx.graphics.getHeight() / 2f);
     }
 
     public void update(float delta) {
+        // tempo total de jogo
+        elapsedTime += delta;
+
+        // calcula intervalo atual (diminui linearmente até o mínimo)
+        float currentInterval = Math.max(minAlienSpawnInterval,
+            initialAlienSpawnInterval - elapsedTime * spawnDecreaseRate);
+
+        // atualiza timer e faz spawn quando atingir intervalo atual
         alienSpawnTimer += delta;
-        if (alienSpawnTimer >= alienSpawnInterval) {
-            alienSpawnTimer = 0;
-            spawnAlien();
+        if (alienSpawnTimer >= currentInterval) {
+            alienSpawnTimer = 0f;
+            spawnAlien(); // sempre um por vez
         }
 
         // Atualiza balas
@@ -57,7 +74,7 @@ public class World {
         }
 
         // Atualiza o herói
-        hero.update(delta);
+        if (hero != null) hero.update(delta);
 
         // Remove balas mortas
         for (int i = activeBullets.size; --i >= 0;) {
@@ -82,7 +99,11 @@ public class World {
 
     private void spawnAlien() {
         Alien alien = alienPool.obtain();
+
+        // calcula Y central do herói para alinhar verticalmente
         float heroCenterY = hero.getY() + hero.getHeight() / 2f;
+
+        // spawn do alien vindo da direita, na mesma altura (centro) do herói
         alien.init(Gdx.graphics.getWidth(), heroCenterY);
         activeAliens.add(alien);
     }
@@ -125,7 +146,7 @@ public class World {
 
             Alien alien = activeAliens.get(j);
 
-            if (hero.isAlive() &&
+            if (hero != null && hero.isAlive() &&
                 hero.getBoundingRectangle().overlaps(
                     alien.getBoundingRectangle())) {
 
@@ -133,6 +154,7 @@ public class World {
             }
         }
     }
+
     public Array<Bullet> getActiveBullets() {
         return activeBullets;
     }
