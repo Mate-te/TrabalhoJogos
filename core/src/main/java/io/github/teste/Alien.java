@@ -10,12 +10,8 @@ public class Alien extends Sprite implements Pool.Poolable {
     private boolean alive;
 
     public Alien(Texture texture) {
-
         super(texture);
-
         this.alive = false;
-
-        // tamanho do alien
         setSize(64, 64);
     }
 

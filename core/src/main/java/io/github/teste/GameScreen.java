@@ -31,13 +31,12 @@ public class GameScreen implements Screen {
         manager.load("demo.png", Texture.class);
         manager.load("bullet.png", Texture.class);
         batch = new SpriteBatch();
-        font = new BitmapFont(); // fonte padrão do libGDX
+        font = new BitmapFont();
 
         manager.load("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
         manager.load("data/morte.wav", com.badlogic.gdx.audio.Sound.class);
         manager.finishLoading();
 
-        // Obtem sons
         fundo = manager.get("fundojpeg.jpeg", Texture.class);
         alien = manager.get("demo.png", Texture.class);
         heroIMG = manager.get("batman.png", Texture.class);
@@ -78,7 +77,6 @@ public class GameScreen implements Screen {
             alien.draw(batch);
         }
 
-        // renderiza temporizador no canto superior direito
         float elapsedTime = world.getElapsedTime();
         int minutes = (int)(elapsedTime / 60f);
         int seconds = (int)(elapsedTime % 60f);
