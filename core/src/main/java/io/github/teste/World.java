@@ -34,9 +34,9 @@ public class World {
     private float elapsedTime = 0f;
 
     // dificuldade
-    private final float initialAlienSpawnInterval = 0.8f; // intervalo inicial (s) — ajuste aqui
-    private final float minAlienSpawnInterval = 0.5f;    // intervalo mínimo (s) — ajuste se quiser
-    private final float timeToReachMin = 60f;             // segundos para diminuir até o mínimo
+    private final float initialAlienSpawnInterval = 0.8f;
+    private final float minAlienSpawnInterval = 0.5f;
+    private final float timeToReachMin = 60f;
     private final float spawnDecreaseRate = (initialAlienSpawnInterval - minAlienSpawnInterval) / timeToReachMin;
 
     public World(AssetManager manager, Hero hero) {
@@ -44,39 +44,25 @@ public class World {
         this.hero = hero;
         this.alienTexture = manager.get("demo.png", Texture.class);
         this.bulletTexture = manager.get("bullet.png", Texture.class);
-        // Não é obrigatório inicializar a posição do hero aqui se depois o GameScreen posiciona.
-        // this.hero.init(0, Gdx.graphics.getHeight() / 2f);
     }
 
     public void update(float delta) {
-        // tempo total de jogo
         elapsedTime += delta;
 
-        // calcula intervalo atual (diminui linearmente até o mínimo)
         float currentInterval = Math.max(minAlienSpawnInterval,
             initialAlienSpawnInterval - elapsedTime * spawnDecreaseRate);
-
-        // atualiza timer e faz spawn quando atingir intervalo atual
         alienSpawnTimer += delta;
         if (alienSpawnTimer >= currentInterval) {
             alienSpawnTimer = 0f;
-            spawnAlien(); // sempre um por vez
+            spawnAlien();
         }
-
-        // Atualiza balas
         for (Bullet bullet : activeBullets) {
             bullet.update(delta);
         }
-
-        // Atualiza aliens
         for (Alien alien : activeAliens) {
             alien.update(delta);
         }
-
-        // Atualiza o herói
         if (hero != null) hero.update(delta);
-
-        // Remove balas mortas
         for (int i = activeBullets.size; --i >= 0;) {
             Bullet bullet = activeBullets.get(i);
             if (!bullet.isAlive()) {
@@ -84,8 +70,6 @@ public class World {
                 bulletPool.free(bullet);
             }
         }
-
-        // Remove aliens mortos
         for (int i = activeAliens.size; --i >= 0;) {
             Alien alien = activeAliens.get(i);
             if (!alien.isAlive()) {
@@ -93,17 +77,14 @@ public class World {
                 alienPool.free(alien);
             }
         }
-
         checkCollisions();
     }
 
     private void spawnAlien() {
         Alien alien = alienPool.obtain();
 
-        // calcula Y central do herói para alinhar verticalmente
         float heroCenterY = hero.getY() + hero.getHeight() / 2f;
 
-        // spawn do alien vindo da direita, na mesma altura (centro) do herói
         alien.init(Gdx.graphics.getWidth(), heroCenterY);
         activeAliens.add(alien);
     }
@@ -113,7 +94,6 @@ public class World {
         bullet.init(x, y);
         activeBullets.add(bullet);
 
-        // Verifica se o som foi carregado e toca
         if (manager.isLoaded("data/PIU.wav", com.badlogic.gdx.audio.Sound.class)) {
             com.badlogic.gdx.audio.Sound s = manager.get("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
             bullet.setSom(s);

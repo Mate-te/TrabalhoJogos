@@ -21,7 +21,6 @@ public class HeroInputManager implements InputProcessor {
     }
     @Override
     public boolean keyDown(int keycode) {
-        // detecta tecla pressionada
         if (keycode == Input.Keys.A || keycode == Input.Keys.LEFT) {
             moveLeft = true;
             updateHeroVelocity();
@@ -72,7 +71,6 @@ public class HeroInputManager implements InputProcessor {
     }
 
     private void updateHeroVelocity() {
-        // calcula velocidade baseada em teclas pressionadas
         float vx = 0f;
         float vy = 0f;
 

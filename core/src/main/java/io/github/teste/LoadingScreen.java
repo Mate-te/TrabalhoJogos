@@ -33,6 +33,8 @@ public class LoadingScreen implements Screen {
         manager.load("batman.png", Texture.class);
         manager.load("demo.png", Texture.class);
         manager.load("bullet.png", Texture.class);
+        manager.load("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
+        manager.load("data/morte.wav", com.badlogic.gdx.audio.Sound.class);
     }
 
     @Override
