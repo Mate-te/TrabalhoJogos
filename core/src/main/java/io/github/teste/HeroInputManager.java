@@ -32,8 +32,8 @@ public class HeroInputManager implements InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (hero != null && hero.isAlive() && world != null) {
-            float shootX = hero.getPosition().x + heroTexture.getWidth();
-            float shootY = hero.getPosition().y + heroTexture.getHeight() / 2f;
+            float shootX = hero.getX() + heroTexture.getWidth();
+            float shootY = hero.getY() + heroTexture.getHeight() / 2f;
             world.shoot(shootX, shootY);
         }
         return true;

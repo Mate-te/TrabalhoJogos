@@ -1,32 +1,49 @@
 package io.github.teste;
 
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 
-public class Hero {
-    private Vector2 position;
+public class Hero extends Sprite {
+
     private boolean alive;
-    private Sound deathSound;
-    private HeroInputManager inputManager; // Variável para gerenciar input
 
-    public Hero(Sound deathSound) {
-        this.position = new Vector2();
+    private Sound deathSound;
+
+    private HeroInputManager inputManager;
+
+    public Hero(Texture texture, Sound deathSound) {
+
+        super(texture);
+
         this.alive = true;
+
         this.deathSound = deathSound;
+
+        setSize(64, 64);
     }
 
     public void init(float posX, float posY) {
-        position.set(posX, posY);
+
+        setPosition(
+            posX - getWidth()/2f,
+            posY - getHeight()/2f
+        );
+
         alive = true;
     }
 
     public void update(float delta) {
-        // Cowboy é estacionário até o momento
+
+        // lógica futura de movimento
     }
 
     public void die() {
+
         if (alive) {
+
             alive = false;
+
             if (deathSound != null) {
                 deathSound.play();
             }
@@ -34,22 +51,17 @@ public class Hero {
     }
 
     public boolean isAlive() {
+
         return alive;
     }
 
-    public Vector2 getPosition() {
-        return position;
-    }
-
-    public void setPosition(float x, float y) {
-        position.set(x, y);
-    }
-
     public void setInputManager(HeroInputManager inputManager) {
+
         this.inputManager = inputManager;
     }
 
     public HeroInputManager getInputManager() {
+
         return inputManager;
     }
 }

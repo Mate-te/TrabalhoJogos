@@ -1,25 +1,27 @@
 package io.github.teste;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 
 public class World {
 
+    private Texture bulletTexture;
+    private Texture alienTexture;
     private final Array<Bullet> activeBullets = new Array<Bullet>();
     private final Array<Alien> activeAliens = new Array<Alien>();
     private final Pool<Bullet> bulletPool = new Pool<Bullet>() {
         @Override
         protected Bullet newObject() {
-            return new Bullet();
+            return new Bullet(bulletTexture);
         }
     };
     private final Pool<Alien> alienPool = new Pool<Alien>() {
         @Override
         protected Alien newObject() {
-            return new Alien();
+            return new Alien(alienTexture);
         }
     };
 
@@ -32,7 +34,8 @@ public class World {
     public World(AssetManager manager, Hero hero) {
         this.manager = manager;
         this.hero = hero;
-        // Posiciona na esquerda, altura central
+        this.alienTexture = manager.get("demo.png", Texture.class);
+        this.bulletTexture = manager.get("bullet.png", Texture.class);
         this.hero.init(0, Gdx.graphics.getHeight() / 2f);
     }
 
@@ -79,8 +82,8 @@ public class World {
 
     private void spawnAlien() {
         Alien alien = alienPool.obtain();
-        // Usa a posição Y do herói
-        alien.init(Gdx.graphics.getWidth(), hero.getPosition().y);
+        float heroCenterY = hero.getY() + hero.getHeight() / 2f;
+        alien.init(Gdx.graphics.getWidth(), heroCenterY);
         activeAliens.add(alien);
     }
 
@@ -98,27 +101,38 @@ public class World {
     }
 
     private void checkCollisions() {
-        // Colisões bala vs alien
+
+        // bala vs alien
         for (int i = activeBullets.size; --i >= 0;) {
+
             Bullet bullet = activeBullets.get(i);
+
             for (int j = activeAliens.size; --j >= 0;) {
+
                 Alien alien = activeAliens.get(j);
-                if (bullet.getPosition().dst(alien.getPosition()) < 50) {
+
+                if (bullet.getBoundingRectangle().overlaps(
+                    alien.getBoundingRectangle())) {
+
                     bullet.setAlive(false);
                     alien.setAlive(false);
                 }
             }
         }
 
-        // Colisões alien vs herói
+        // alien vs herói
         for (int j = activeAliens.size; --j >= 0;) {
+
             Alien alien = activeAliens.get(j);
-            if (hero.isAlive() && hero.getPosition().dst(alien.getPosition()) < 50) {
+
+            if (hero.isAlive() &&
+                hero.getBoundingRectangle().overlaps(
+                    alien.getBoundingRectangle())) {
+
                 hero.die();
             }
         }
     }
-
     public Array<Bullet> getActiveBullets() {
         return activeBullets;
     }

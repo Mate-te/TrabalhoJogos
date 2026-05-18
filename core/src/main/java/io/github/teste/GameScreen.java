@@ -14,7 +14,7 @@ public class GameScreen implements Screen {
     private SpriteBatch batch;
     private Texture fundo;
     private Texture alien;
-    private Texture cowboy;
+    private Texture heroIMG;
     private Texture bullet;
     private World world;
     private Hero hero;
@@ -28,11 +28,6 @@ public class GameScreen implements Screen {
         manager.load("batman.png", Texture.class);
         manager.load("demo.png", Texture.class);
         manager.load("bullet.png", Texture.class);
-
-        fundo = manager.get("fundojpeg.jpeg", Texture.class);
-        alien = manager.get("demo.png", Texture.class);
-        cowboy = manager.get("batman.png", Texture.class);
-        bullet = manager.get("bullet.png", Texture.class);
         batch = new SpriteBatch();
 
 
@@ -41,20 +36,24 @@ public class GameScreen implements Screen {
         manager.finishLoading();
 
         // Obtem sons
+        fundo = manager.get("fundojpeg.jpeg", Texture.class);
+        alien = manager.get("demo.png", Texture.class);
+        heroIMG = manager.get("batman.png", Texture.class);
+        bullet = manager.get("bullet.png", Texture.class);
         com.badlogic.gdx.audio.Sound shootSound = manager.get("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
         com.badlogic.gdx.audio.Sound deathSound = manager.get("data/morte.wav", com.badlogic.gdx.audio.Sound.class);
 
         // Cria o herói
-        hero = new Hero(deathSound);
+        hero = new Hero(heroIMG,deathSound);
 
         // Cria o mundo
         world = new World(manager, hero);
 
         // Posiciona o herói
-        hero.setPosition(50, (float) Gdx.graphics.getHeight() / 2.0f - cowboy.getHeight() / 2.0f);
+        hero.setPosition(50, (float) Gdx.graphics.getHeight() / 2.0f - hero.getHeight() / 2.0f);
 
         // Cria o gerenciador de input do herói
-        heroInputManager = new HeroInputManager(hero, world, cowboy);
+        heroInputManager = new HeroInputManager(hero, world, heroIMG);
 
         // Injeta o gerenciador no herói
         hero.setInputManager(heroInputManager);
@@ -76,15 +75,15 @@ public class GameScreen implements Screen {
         batch.draw(fundo, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         if (world.getHero().isAlive()) {
-            batch.draw(cowboy, world.getHero().getPosition().x, world.getHero().getPosition().y);
+            world.getHero().draw(batch);
         }
 
-        for (Bullet b : world.getActiveBullets()) {
-            batch.draw(bullet, b.getPosition().x, b.getPosition().y);
+        for (Bullet bullet : world.getActiveBullets()) {
+            bullet.draw(batch);
         }
 
-        for (Alien a : world.getActiveAliens()) {
-            batch.draw(alien, a.getPosition().x, a.getPosition().y);
+        for (Alien alien : world.getActiveAliens()) {
+            alien.draw(batch);
         }
 
         batch.end();
