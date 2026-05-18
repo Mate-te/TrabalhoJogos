@@ -1,50 +1,68 @@
 package io.github.teste;
 
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Pool;
 
-public class Alien implements Pool.Poolable {
-    private Vector2 position;
+public class Alien extends Sprite implements Pool.Poolable {
+
     private boolean alive;
 
-    public Alien() {
-        this.position = new Vector2();
+    public Alien(Texture texture) {
+
+        super(texture);
+
         this.alive = false;
+
+        // tamanho do alien
+        setSize(64, 64);
     }
 
     public void init(float posX, float posY) {
-        position.set(posX, posY);
+
+        // centraliza o sprite
+        setPosition(
+            posX - getWidth() / 2f,
+            posY - getHeight() / 2f
+        );
+
         alive = true;
     }
 
     @Override
     public void reset() {
-        position.set(0, 0);
+
+        setPosition(0, 0);
+
         alive = false;
     }
 
     public void update(float delta) {
+
         if (isOutOfScreen()) {
+
             alive = false;
+
         } else {
-            // Move para a esquerda
-            position.add(-400 * delta, 0);
+
+            // move para esquerda
+            translateX(-400 * delta);
         }
     }
 
     private boolean isOutOfScreen() {
-        return position.x < -100; // Saiu da tela pela esquerda
+
+        return getX() < -100;
     }
 
     public boolean isAlive() {
+
         return alive;
     }
 
     public void setAlive(boolean alive) {
-        this.alive = alive;
-    }
 
-    public Vector2 getPosition() {
-        return position;
+        this.alive = alive;
     }
 }

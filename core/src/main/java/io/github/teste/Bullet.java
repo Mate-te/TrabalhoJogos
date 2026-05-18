@@ -1,41 +1,55 @@
 package io.github.teste;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Pool;
 
-public class Bullet implements Pool.Poolable{
+public class Bullet extends Sprite implements Pool.Poolable {
 
-
-    private Vector2 position;
     private boolean alive;
-    private Sound Som;
+    private Sound som;
 
-    public Bullet() {
-        this.position = new Vector2();
+    public Bullet(Texture texture) {
+        super(texture);
+
         this.alive = false;
 
+        // tamanho da bala
+        setSize(32, 32);
     }
+
     public void init(float posX, float posY) {
-        position.set(posX, posY);
+
+        // centraliza a sprite
+        setPosition(
+            posX - getWidth() / 2f,
+            posY - getHeight() / 2f
+        );
+
         alive = true;
     }
 
     @Override
     public void reset() {
-        position.set(0,0);
+        setPosition(0, 0);
         alive = false;
     }
-    public void update (float delta) {
+
+    public void update(float delta) {
+
         if (isOutOfScreen()) {
             alive = false;
         } else {
-            position.add(500*delta, 0);
+
+            // move no eixo X
+            translateX(500 * delta);
         }
     }
 
     private boolean isOutOfScreen() {
-        return position.x > com.badlogic.gdx.Gdx.graphics.getWidth() + 100;
+        return getX() > Gdx.graphics.getWidth() + 100;
     }
 
     public boolean isAlive() {
@@ -46,15 +60,11 @@ public class Bullet implements Pool.Poolable{
         this.alive = alive;
     }
 
-    public Vector2 getPosition() {
-        return position;
-    }
-
     public Sound getSom() {
-        return Som;
+        return som;
     }
 
     public void setSom(Sound som) {
-        Som = som;
+        this.som = som;
     }
 }

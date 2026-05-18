@@ -1,50 +1,66 @@
 package io.github.teste;
+
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.utils.ScreenUtils;
-import jdk.javadoc.internal.doclets.formats.html.markup.Text;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 
 public class World {
 
+    private Texture bulletTexture;
+    private Texture alienTexture;
     private final Array<Bullet> activeBullets = new Array<Bullet>();
     private final Array<Alien> activeAliens = new Array<Alien>();
+
     private final Pool<Bullet> bulletPool = new Pool<Bullet>() {
         @Override
         protected Bullet newObject() {
-            return new Bullet();
+            return new Bullet(bulletTexture);
         }
     };
     private final Pool<Alien> alienPool = new Pool<Alien>() {
         @Override
         protected Alien newObject() {
-            return new Alien();
+            return new Alien(alienTexture);
         }
     };
+
     private AssetManager manager;
-    private Hero hero; // Novo campo para encapsular o cowboy
+    private Hero hero;
 
-    public float alienSpawnTimer = 0.5f;
-    public float alienSpawnInterval = 0.5f;
+    // timers
+    private float alienSpawnTimer = 0f;
+    private float elapsedTime = 0f;
 
-    public World(AssetManager manager) {
+    // dificuldade
+    private final float initialAlienSpawnInterval = 0.8f; // intervalo inicial (s) — ajuste aqui
+    private final float minAlienSpawnInterval = 0.5f;    // intervalo mínimo (s) — ajuste se quiser
+    private final float timeToReachMin = 60f;             // segundos para diminuir até o mínimo
+    private final float spawnDecreaseRate = (initialAlienSpawnInterval - minAlienSpawnInterval) / timeToReachMin;
+
+    public World(AssetManager manager, Hero hero) {
         this.manager = manager;
-        // Inicializa o herói (cowboy) com o som de morte e posição inicial
-        Sound deathSound = manager.get("data/morte.wav", Sound.class);
-        this.hero = new Hero(deathSound);
-        this.hero.init(0, Gdx.graphics.getHeight() / 2); // Posiciona na esquerda, altura central
+        this.hero = hero;
+        this.alienTexture = manager.get("demo.png", Texture.class);
+        this.bulletTexture = manager.get("bullet.png", Texture.class);
+        // Não é obrigatório inicializar a posição do hero aqui se depois o GameScreen posiciona.
+        // this.hero.init(0, Gdx.graphics.getHeight() / 2f);
     }
 
-    // Removido: private float cowboyY; (agora vem do hero)
-
     public void update(float delta) {
+        // tempo total de jogo
+        elapsedTime += delta;
+
+        // calcula intervalo atual (diminui linearmente até o mínimo)
+        float currentInterval = Math.max(minAlienSpawnInterval,
+            initialAlienSpawnInterval - elapsedTime * spawnDecreaseRate);
+
+        // atualiza timer e faz spawn quando atingir intervalo atual
         alienSpawnTimer += delta;
-        if (alienSpawnTimer >= alienSpawnInterval) {
-            alienSpawnTimer = 0;
-            spawnAlien();
+        if (alienSpawnTimer >= currentInterval) {
+            alienSpawnTimer = 0f;
+            spawnAlien(); // sempre um por vez
         }
 
         // Atualiza balas
@@ -57,8 +73,8 @@ public class World {
             alien.update(delta);
         }
 
-        // Novo: Atualiza o herói
-        hero.update(delta);
+        // Atualiza o herói
+        if (hero != null) hero.update(delta);
 
         // Remove balas mortas
         for (int i = activeBullets.size; --i >= 0;) {
@@ -83,7 +99,12 @@ public class World {
 
     private void spawnAlien() {
         Alien alien = alienPool.obtain();
-        alien.init(Gdx.graphics.getWidth(), hero.getPosition().y); // Usa a posição Y do herói
+
+        // calcula Y central do herói para alinhar verticalmente
+        float heroCenterY = hero.getY() + hero.getHeight() / 2f;
+
+        // spawn do alien vindo da direita, na mesma altura (centro) do herói
+        alien.init(Gdx.graphics.getWidth(), heroCenterY);
         activeAliens.add(alien);
     }
 
@@ -91,29 +112,45 @@ public class World {
         Bullet bullet = bulletPool.obtain();
         bullet.init(x, y);
         activeBullets.add(bullet);
-        bullet.setSom(manager.get("data/PIU.wav", Sound.class));
-        bullet.getSom().play();
+
+        // Verifica se o som foi carregado e toca
+        if (manager.isLoaded("data/PIU.wav", com.badlogic.gdx.audio.Sound.class)) {
+            com.badlogic.gdx.audio.Sound s = manager.get("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
+            bullet.setSom(s);
+            if (s != null) s.play();
+        }
     }
 
     private void checkCollisions() {
-        // Colisões bala vs alien (mantém igual)
+
+        // bala vs alien
         for (int i = activeBullets.size; --i >= 0;) {
+
             Bullet bullet = activeBullets.get(i);
+
             for (int j = activeAliens.size; --j >= 0;) {
+
                 Alien alien = activeAliens.get(j);
-                if (bullet.getPosition().dst(alien.getPosition()) < 50) { // assume raio 50
+
+                if (bullet.getBoundingRectangle().overlaps(
+                    alien.getBoundingRectangle())) {
+
                     bullet.setAlive(false);
                     alien.setAlive(false);
                 }
             }
         }
 
-        // Novo: Colisões alien vs herói
+        // alien vs herói
         for (int j = activeAliens.size; --j >= 0;) {
+
             Alien alien = activeAliens.get(j);
-            if (hero.isAlive() && hero.getPosition().dst(alien.getPosition()) < 50) { // assume raio 50
-                hero.die(); // Mata o herói e toca som
-                // Opcional: Aqui você pode adicionar lógica para game over, ex: parar o jogo
+
+            if (hero != null && hero.isAlive() &&
+                hero.getBoundingRectangle().overlaps(
+                    alien.getBoundingRectangle())) {
+
+                hero.die();
             }
         }
     }
@@ -126,10 +163,11 @@ public class World {
         return activeAliens;
     }
 
-    // Novo: Getter para acessar o herói (útil para renderização em GameScreen)
     public Hero getHero() {
         return hero;
     }
 
-    // Removido: public void setCowboyY(float y) (não precisa mais)
+    public float getElapsedTime() {
+        return elapsedTime;
+    }
 }
