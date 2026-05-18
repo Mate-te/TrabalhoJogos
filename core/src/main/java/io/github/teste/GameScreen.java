@@ -3,6 +3,7 @@ package io.github.teste;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.Gdx;
@@ -12,6 +13,7 @@ public class GameScreen implements Screen {
     private Game game;
     private AssetManager manager;
     private SpriteBatch batch;
+    private BitmapFont font;
     private Texture fundo;
     private Texture alien;
     private Texture heroIMG;
@@ -29,7 +31,7 @@ public class GameScreen implements Screen {
         manager.load("demo.png", Texture.class);
         manager.load("bullet.png", Texture.class);
         batch = new SpriteBatch();
-
+        font = new BitmapFont(); // fonte padrão do libGDX
 
         manager.load("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
         manager.load("data/morte.wav", com.badlogic.gdx.audio.Sound.class);
@@ -43,22 +45,12 @@ public class GameScreen implements Screen {
         com.badlogic.gdx.audio.Sound shootSound = manager.get("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
         com.badlogic.gdx.audio.Sound deathSound = manager.get("data/morte.wav", com.badlogic.gdx.audio.Sound.class);
 
-        // Cria o herói
         hero = new Hero(heroIMG,deathSound);
-
-        // Cria o mundo
         world = new World(manager, hero);
 
-        // Posiciona o herói
         hero.setPosition(50, (float) Gdx.graphics.getHeight() / 2.0f - hero.getHeight() / 2.0f);
-
-        // Cria o gerenciador de input do herói
         heroInputManager = new HeroInputManager(hero, world, heroIMG);
-
-        // Injeta o gerenciador no herói
         hero.setInputManager(heroInputManager);
-
-        // Registra o gerenciador de input como InputProcessor
         Gdx.input.setInputProcessor(heroInputManager);
     }
 
@@ -86,6 +78,16 @@ public class GameScreen implements Screen {
             alien.draw(batch);
         }
 
+        // renderiza temporizador no canto superior direito
+        float elapsedTime = world.getElapsedTime();
+        int minutes = (int)(elapsedTime / 60f);
+        int seconds = (int)(elapsedTime % 60f);
+        int milliseconds = (int)((elapsedTime % 1f) * 1000f);
+        String timeText = String.format("%02d:%02d:%03d", minutes, seconds, milliseconds);
+        font.draw(batch, timeText,
+            Gdx.graphics.getWidth() - 100,
+            Gdx.graphics.getHeight() - 20);
+
         batch.end();
     }
 
@@ -104,5 +106,6 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
+        font.dispose(); // importante: descartar a fonte
     }
 }

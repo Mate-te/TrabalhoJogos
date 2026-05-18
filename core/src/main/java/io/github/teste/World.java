@@ -166,4 +166,8 @@ public class World {
     public Hero getHero() {
         return hero;
     }
+
+    public float getElapsedTime() {
+        return elapsedTime;
+    }
 }
