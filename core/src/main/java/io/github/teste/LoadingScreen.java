@@ -30,7 +30,7 @@ public class LoadingScreen implements Screen {
 
     private void loadAssets() {
         manager.load("fundojpeg.jpeg", Texture.class);
-        manager.load("batman.png", Texture.class);
+        manager.load("naveL.png", Texture.class);
         manager.load("demo.png", Texture.class);
         manager.load("bullet.png", Texture.class);
         manager.load("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);

@@ -19,6 +19,7 @@ public class HeroInputManager implements InputProcessor {
         this.world = world;
         this.heroTexture = heroTexture;
     }
+
     @Override
     public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.A || keycode == Input.Keys.LEFT) {
@@ -46,7 +47,6 @@ public class HeroInputManager implements InputProcessor {
 
     @Override
     public boolean keyUp(int keycode) {
-        // detecta tecla solta
         if (keycode == Input.Keys.A || keycode == Input.Keys.LEFT) {
             moveLeft = false;
             updateHeroVelocity();
@@ -84,42 +84,26 @@ public class HeroInputManager implements InputProcessor {
     }
 
     @Override
-    public boolean keyTyped(char character) {
-        return false;
-    }
+    public boolean keyTyped(char character) { return false; }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (hero != null && hero.isAlive() && world != null) {
-            float shootX = hero.getX() + heroTexture.getWidth();
-            float shootY = hero.getY() + heroTexture.getHeight() / 2f;
-            world.shoot(shootX, shootY);
+        if (button == Input.Buttons.LEFT && hero != null && hero.isAlive() && world != null) {
+            float shootX = hero.getX() + hero.getWidth() / 2f;
+            float shootY = hero.getY() + hero.getHeight() / 2f;
+            world.shoot(shootX, shootY, hero.getRotation());
         }
         return true;
     }
 
     @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) { return false; }
     @Override
-    public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
+    public boolean touchCancelled(int screenX, int screenY, int pointer, int button) { return false; }
     @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
-    }
-
+    public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
     @Override
-    public boolean mouseMoved(int screenX, int screenY) {
-        return false;
-    }
-
+    public boolean mouseMoved(int screenX, int screenY) { return false; }
     @Override
-    public boolean scrolled(float amountX, float amountY) {
-        return false;
-    }
+    public boolean scrolled(float amountX, float amountY) { return false; }
 }
