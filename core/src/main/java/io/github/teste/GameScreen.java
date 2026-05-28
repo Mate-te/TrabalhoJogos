@@ -1,7 +1,6 @@
 package io.github.teste;
 
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,7 +13,6 @@ import com.badlogic.gdx.math.Vector3;
 
 public class GameScreen implements Screen {
     private Game game;
-    private AssetManager manager;
     private SpriteBatch batch;
     private BitmapFont font;
     private Texture fundo;
@@ -29,9 +27,8 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private Vector3 mousePosTemp;
 
-    public GameScreen(Game game, AssetManager manager) {
+    public GameScreen(Game game) {
         this.game = game;
-        this.manager = manager;
 
         batch = new SpriteBatch();
         font = new BitmapFont();
@@ -42,23 +39,23 @@ public class GameScreen implements Screen {
         mousePosTemp = new Vector3();
 
         // Recuperação dos assets carregados no LoadingScreen
-        fundo = manager.get("fundojpeg.jpeg", Texture.class);
-        alien = manager.get("demo.png", Texture.class);
+        fundo = Assets.manager.get(Assets.FUNDO, Texture.class);
+        alien = Assets.manager.get(Assets.ALIEN, Texture.class);
 
         // ATENÇÃO: Verifique se no LoadingScreen mudou a string para "nave.png" ou manteve "batman.png"
-        // Esta string DEVE ser idêntica à que está no manager.load() do LoadingScreen
-        heroIMG = manager.get("naveL.png", Texture.class);
-        bullet = manager.get("bullet.png", Texture.class);
+        // Esta string DEVE ser idêntica à que está no Assets.manager.load() do LoadingScreen
+        heroIMG = Assets.manager.get(Assets.NAVE, Texture.class);
+        bullet = Assets.manager.get(Assets.BULLET, Texture.class);
 
-        com.badlogic.gdx.audio.Sound shootSound = manager.get("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
-        com.badlogic.gdx.audio.Sound deathSound = manager.get("data/morte.wav", com.badlogic.gdx.audio.Sound.class);
+        com.badlogic.gdx.audio.Sound shootSound = Assets.manager.get(Assets.SOM_TIRO, com.badlogic.gdx.audio.Sound.class);
+        com.badlogic.gdx.audio.Sound deathSound = Assets.manager.get(Assets.SOM_MORTE, com.badlogic.gdx.audio.Sound.class);
 
         hero = new Hero(heroIMG, deathSound);
         // Define o centro do sprite como o ponto de origem para a rotação
         hero.setOriginCenter();
         hero.init(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f);
 
-        world = new World(manager, hero);
+        world = new World(hero);
 
         heroInputManager = new HeroInputManager(hero, world, heroIMG);
         hero.setInputManager(heroInputManager);

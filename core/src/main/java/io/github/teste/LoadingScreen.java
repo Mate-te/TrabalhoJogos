@@ -1,8 +1,6 @@
 package io.github.teste;
 
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -13,28 +11,17 @@ import com.badlogic.gdx.math.MathUtils;
 
 public class LoadingScreen implements Screen {
     private Game game;
-    private AssetManager manager;
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
     private float angle = 0;
 
-    public LoadingScreen(Game game, AssetManager manager) {
+    public LoadingScreen(Game game) {
         this.game = game;
-        this.manager = manager;
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
-        loadAssets();
-    }
-
-    private void loadAssets() {
-        manager.load("fundojpeg.jpeg", Texture.class);
-        manager.load("naveL.png", Texture.class);
-        manager.load("demo.png", Texture.class);
-        manager.load("bullet.png", Texture.class);
-        manager.load("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
-        manager.load("data/morte.wav", com.badlogic.gdx.audio.Sound.class);
+        Assets.loadAll();
     }
 
     @Override
@@ -44,16 +31,16 @@ public class LoadingScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if (manager.update()) {
-            game.setScreen(new GameScreen(game, manager));
+        if (Assets.manager.update()) {
+            game.setScreen(new GameScreen(game));
             return;
         }
 
         angle += delta * 360; // rotate 360 degrees per second
 
         batch.begin();
-        String progressText = "Loading... " + (int)(manager.getProgress() * 100) + "%";
-        font.draw(batch, progressText, Gdx.graphics.getWidth()/2 - 50, Gdx.graphics.getHeight()/2 + 50);
+        String progressText = "Loading... " + (int)(Assets.manager.getProgress() * 100) + "%";
+        font.draw(batch, progressText, (float) Gdx.graphics.getWidth() /2 - 50, (float) Gdx.graphics.getHeight() /2 + 50);
         batch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);

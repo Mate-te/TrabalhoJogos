@@ -1,6 +1,6 @@
 package io.github.teste;
 
-import com.badlogic.gdx.assets.AssetManager;
+
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.Gdx;
@@ -27,7 +27,6 @@ public class World {
         }
     };
 
-    private AssetManager manager;
     private Hero hero;
 
     private float alienSpawnTimer = 0f;
@@ -38,11 +37,10 @@ public class World {
     private final float timeToReachMin = 60f;
     private final float spawnDecreaseRate = (initialAlienSpawnInterval - minAlienSpawnInterval) / timeToReachMin;
 
-    public World(AssetManager manager, Hero hero) {
-        this.manager = manager;
+    public World(Hero hero) {
         this.hero = hero;
-        this.alienTexture = manager.get("demo.png", Texture.class);
-        this.bulletTexture = manager.get("bullet.png", Texture.class);
+        this.alienTexture = Assets.manager.get(Assets.ALIEN, Texture.class);
+        this.bulletTexture = Assets.manager.get(Assets.BULLET, Texture.class);
     }
 
     public void update(float delta) {
@@ -93,8 +91,8 @@ public class World {
         bullet.init(x, y, angleDeg);
         activeBullets.add(bullet);
 
-        if (manager.isLoaded("data/PIU.wav", com.badlogic.gdx.audio.Sound.class)) {
-            com.badlogic.gdx.audio.Sound s = manager.get("data/PIU.wav", com.badlogic.gdx.audio.Sound.class);
+        if (Assets.manager.isLoaded(Assets.SOM_TIRO, com.badlogic.gdx.audio.Sound.class)) {
+            com.badlogic.gdx.audio.Sound s = Assets.manager.get(Assets.SOM_TIRO, com.badlogic.gdx.audio.Sound.class);
             bullet.setSom(s);
             if (s != null) s.play();
         }
