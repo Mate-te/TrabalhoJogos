@@ -123,6 +123,10 @@ public class GameScreen implements Screen {
         String timeText = String.format("%02d:%02d:%03d", minutes, seconds, milliseconds);
         font.draw(batch, timeText, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 20);
 
+        int lives = world.getHero().getLives();
+        String livesText = "Vidas: " + lives;
+        font.draw(batch, livesText, 20, Gdx.graphics.getHeight() - 20);
+
         batch.end();
     }
 

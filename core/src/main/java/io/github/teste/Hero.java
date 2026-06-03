@@ -14,29 +14,37 @@ public class Hero extends Sprite {
     private float velocityY = 0f;
     private final float moveSpeed = 200f;
 
+    private int lives = 5;
+    private float lastHitTime = 0f;
+    private final float hitCooldown = 1f; // 1 segundo entre danos
+
     public Hero(Texture texture, Sound deathSound) {
         super(texture);
         this.alive = true;
         this.deathSound = deathSound;
+        this.lives = 5;
         setSize(64, 64);
     }
 
     public void init(float posX, float posY) {
-
         setPosition(
             posX - getWidth()/2f,
             posY - getHeight()/2f
         );
         alive = true;
+        lives = 5;
+        lastHitTime = 0f;
         velocityX = 0f;
         velocityY = 0f;
     }
 
     public void update(float delta) {
+        if (lastHitTime > 0) {
+            lastHitTime -= delta;
+        }
 
         setPosition(getX() + velocityX * delta, getY() + velocityY * delta);
 
-        // limita para não sair da tela
         if (getX() < 0) setX(0);
         if (getX() + getWidth() > Gdx.graphics.getWidth()) {
             setX(Gdx.graphics.getWidth() - getWidth());
@@ -44,7 +52,19 @@ public class Hero extends Sprite {
         if (getY() < 0) setY(0);
         if (getY() + getHeight() > Gdx.graphics.getHeight()) {
             setY(Gdx.graphics.getHeight() - getHeight());
-        }    }
+        }
+    }
+
+    public void takeDamage() {
+        if (lastHitTime <= 0 && alive) {
+            lives--;
+            lastHitTime = hitCooldown;
+
+            if (lives <= 0) {
+                die();
+            }
+        }
+    }
 
     public void die() {
         if (alive) {
@@ -56,17 +76,18 @@ public class Hero extends Sprite {
     }
 
     public boolean isAlive() {
-
         return alive;
     }
 
-    public void setInputManager(HeroInputManager inputManager) {
+    public int getLives() {
+        return lives;
+    }
 
+    public void setInputManager(HeroInputManager inputManager) {
         this.inputManager = inputManager;
     }
 
     public HeroInputManager getInputManager() {
-
         return inputManager;
     }
 

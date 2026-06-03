@@ -113,7 +113,8 @@ public class World {
         for (int j = activeAliens.size; --j >= 0;) {
             Alien alien = activeAliens.get(j);
             if (hero != null && hero.isAlive() && hero.getBoundingRectangle().overlaps(alien.getBoundingRectangle())) {
-                hero.die();
+                alien.setAlive(false);
+                hero.takeDamage();
             }
         }
     }
