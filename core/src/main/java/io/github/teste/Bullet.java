@@ -7,16 +7,15 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.math.MathUtils;
 
-public class Bullet extends Sprite implements Pool.Poolable {
+public class Bullet extends GameEntity implements Pool.Poolable { // Changed to extend GameEntity
 
-    private boolean alive;
     private Sound som;
     private float angle; // Adicionado para controle de vetor
     private final float speed = 500f;
 
     public Bullet(Texture texture) {
-        super(texture);
-        this.alive = false;
+        super(texture); // Call to GameEntity constructor
+        setAlive(false); // Bullets are not alive by default when created, they are activated from the pool
         setSize(32, 32);
         setOriginCenter(); // Define o centro para rotação da sprite da bala
     }
@@ -28,7 +27,7 @@ public class Bullet extends Sprite implements Pool.Poolable {
         );
         this.angle = angleDeg;
         setRotation(angleDeg);
-        this.alive = true;
+        setAlive(true); // Use setAlive from GameEntity
     }
 
     @Override
@@ -36,12 +35,13 @@ public class Bullet extends Sprite implements Pool.Poolable {
         setPosition(0, 0);
         setRotation(0);
         this.angle = 0f;
-        this.alive = false;
+        setAlive(false); // Use setAlive from GameEntity
     }
 
+    @Override // Mark as override since it's now in GameEntity
     public void update(float delta) {
         if (isOutOfScreen()) {
-            alive = false;
+            setAlive(false); // Use setAlive from GameEntity
         } else {
             // Movimentação baseada no ângulo trigonométrico
             translateX(MathUtils.cosDeg(angle) * speed * delta);
@@ -54,13 +54,7 @@ public class Bullet extends Sprite implements Pool.Poolable {
             getY() > Gdx.graphics.getHeight() + 100 || getY() < -100;
     }
 
-    public boolean isAlive() {
-        return alive;
-    }
-
-    public void setAlive(boolean alive) {
-        this.alive = alive;
-    }
+    // isAlive() and setAlive() methods removed as they are inherited from GameEntity
 
     public Sound getSom() {
         return som;

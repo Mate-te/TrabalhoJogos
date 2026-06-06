@@ -5,9 +5,8 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-public class Hero extends Sprite {
+public class Hero extends GameEntity { // Changed to extend GameEntity
 
-    private boolean alive;
     private Sound deathSound;
     private HeroInputManager inputManager;
     private float velocityX = 0f;
@@ -19,8 +18,7 @@ public class Hero extends Sprite {
     private final float hitCooldown = 1f; // 1 segundo entre danos
 
     public Hero(Texture texture, Sound deathSound) {
-        super(texture);
-        this.alive = true;
+        super(texture); // Call to GameEntity constructor
         this.deathSound = deathSound;
         this.lives = 5;
         setSize(64, 64);
@@ -31,13 +29,14 @@ public class Hero extends Sprite {
             posX - getWidth()/2f,
             posY - getHeight()/2f
         );
-        alive = true;
+        setAlive(true); // Use setAlive from GameEntity
         lives = 5;
         lastHitTime = 0f;
         velocityX = 0f;
         velocityY = 0f;
     }
 
+    @Override
     public void update(float delta) {
         if (lastHitTime > 0) {
             lastHitTime -= delta;
@@ -67,17 +66,15 @@ public class Hero extends Sprite {
     }
 
     public void die() {
-        if (alive) {
-            alive = false;
+        if (isAlive()) { // Use isAlive from GameEntity
+            setAlive(false); // Use setAlive from GameEntity
             if (deathSound != null) {
                 deathSound.play();
             }
         }
     }
 
-    public boolean isAlive() {
-        return alive;
-    }
+    // isAlive() method removed as it's inherited from GameEntity
 
     public int getLives() {
         return lives;

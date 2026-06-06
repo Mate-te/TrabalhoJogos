@@ -5,13 +5,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Pool;
 
-public class Alien extends Sprite implements Pool.Poolable {
-
-    private boolean alive;
+public class Alien extends GameEntity implements Pool.Poolable { // Changed to extend GameEntity
 
     public Alien(Texture texture) {
         super(texture);
-        this.alive = false;
+        setAlive(false);
         setSize(64, 64);
     }
 
@@ -23,7 +21,7 @@ public class Alien extends Sprite implements Pool.Poolable {
             posY - getHeight() / 2f
         );
 
-        alive = true;
+        setAlive(true); // Use setAlive from GameEntity
     }
 
     @Override
@@ -31,14 +29,15 @@ public class Alien extends Sprite implements Pool.Poolable {
 
         setPosition(0, 0);
 
-        alive = false;
+        setAlive(false); // Use setAlive from GameEntity
     }
 
+    @Override // Mark as override since it's now in GameEntity
     public void update(float delta) {
 
         if (isOutOfScreen()) {
 
-            alive = false;
+            setAlive(false); // Use setAlive from GameEntity
 
         } else {
 
@@ -52,13 +51,5 @@ public class Alien extends Sprite implements Pool.Poolable {
         return getX() < -100;
     }
 
-    public boolean isAlive() {
-
-        return alive;
-    }
-
-    public void setAlive(boolean alive) {
-
-        this.alive = alive;
-    }
+    // isAlive() and setAlive() methods removed as they are inherited from GameEntity
 }
