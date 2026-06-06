@@ -21,6 +21,7 @@ public class GameScreen implements Screen {
     private Texture bullet;
     private World world;
     private Hero hero;
+    private SpeechBubble speechBubble;
     private HeroInputManager heroInputManager;
 
     // Câmara ortográfica necessária para converter coordenadas do rato para o mundo
@@ -32,6 +33,7 @@ public class GameScreen implements Screen {
 
         batch = new SpriteBatch();
         font = new BitmapFont();
+
 
         // Inicialização da câmara com as dimensões virtuais da janela gráfica
         camera = new OrthographicCamera();
@@ -55,6 +57,14 @@ public class GameScreen implements Screen {
         hero.setOriginCenter();
         hero.init(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f);
 
+        Texture dialogTex = Assets.manager.get(Assets.DIALOG_BOX, com.badlogic.gdx.graphics.Texture.class);
+        speechBubble = new SpeechBubble(dialogTex, font);
+        speechBubble.setMaxWidth(350f); // limite de largura da caixa em pixels, ajuste conforme quiser
+        speechBubble.setPadding(12f);
+        float centerX = camera.position.x; // usa a posição da câmera (funciona se a câmera se mover)
+        float centerY = camera.position.y;
+        speechBubble.showCentered("Vamos salvar o mundo!", 3f, centerX, centerY);
+
         world = new World(hero);
 
         heroInputManager = new HeroInputManager(hero, world, heroIMG);
@@ -72,7 +82,12 @@ public class GameScreen implements Screen {
 
         // Atualiza a lógica do mundo físico do jogo
         world.update(delta);
-
+        speechBubble.update(delta);
+        if (speechBubble.isVisible()) {
+            float heroX = hero.getX() + hero.getWidth() / 2f;
+            float heroY = hero.getY() + hero.getHeight() / 2f;
+            speechBubble.updateFollowPosition(heroX, heroY);
+        }
         // Lógica de rotação do herói em direção ao cursor do rato
         if (hero.isAlive()) {
             // Captura a posição do rato na tela
@@ -126,6 +141,8 @@ public class GameScreen implements Screen {
         int lives = world.getHero().getLives();
         String livesText = "Vidas: " + lives;
         font.draw(batch, livesText, 20, Gdx.graphics.getHeight() - 20);
+        speechBubble.draw(batch);
+
 
         batch.end();
     }
