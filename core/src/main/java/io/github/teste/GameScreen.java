@@ -10,12 +10,14 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+
 
 public class GameScreen implements Screen {
     private Game game;
     private SpriteBatch batch;
     private BitmapFont font;
-    private Texture fundo;
     private Texture alien;
     private Texture heroIMG;
     private Texture bullet;
@@ -23,6 +25,8 @@ public class GameScreen implements Screen {
     private Hero hero;
     private SpeechBubble speechBubble;
     private HeroInputManager heroInputManager;
+    private OrthogonalTiledMapRenderer tmr;
+    private TiledMap tiledMap;
 
     // Câmara ortográfica necessária para converter coordenadas do rato para o mundo
     private OrthographicCamera camera;
@@ -40,8 +44,10 @@ public class GameScreen implements Screen {
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         mousePosTemp = new Vector3();
 
-        // Recuperação dos assets carregados no LoadingScreen
-        fundo = Assets.manager.get(Assets.FUNDO, Texture.class);
+        // Recuperação dos assets carregados no
+        tiledMap = Assets.manager.get(Assets.MAPA, TiledMap.class);
+        tmr = new OrthogonalTiledMapRenderer(tiledMap);
+
         alien = Assets.manager.get(Assets.ALIEN, Texture.class);
 
         // ATENÇÃO: Verifique se no LoadingScreen mudou a string para "nave.png" ou manteve "batman.png"
@@ -57,10 +63,12 @@ public class GameScreen implements Screen {
         hero.setOriginCenter();
         hero.init(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f);
 
+
         Texture dialogTex = Assets.manager.get(Assets.DIALOG_BOX, com.badlogic.gdx.graphics.Texture.class);
         speechBubble = new SpeechBubble(dialogTex, font);
         speechBubble.setMaxWidth(350f); // limite de largura da caixa em pixels, ajuste conforme quiser
         speechBubble.setPadding(12f);
+
         float centerX = camera.position.x; // usa a posição da câmera (funciona se a câmera se mover)
         float centerY = camera.position.y;
         speechBubble.showCentered("Vamos salvar o mundo!", 3f, centerX, centerY);
@@ -77,7 +85,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        // Limpa o ecrã com a cor de fundo
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
         // Atualiza a lógica do mundo físico do jogo
@@ -111,12 +118,13 @@ public class GameScreen implements Screen {
 
         // Atualiza as matrizes da câmara e vincula-as ao SpriteBatch antes do início do desenho
         camera.update();
+
+        tmr.setView(camera);
+        tmr.render();
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
 
-        // Desenha o fundo adaptado ao tamanho da projeção
-        batch.draw(fundo, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         if (world.getHero().isAlive()) {
             world.getHero().draw(batch);
@@ -164,6 +172,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
+        if (tmr != null) tmr.dispose();
+        if (tiledMap != null) tiledMap.dispose();
         batch.dispose();
         font.dispose();
     }

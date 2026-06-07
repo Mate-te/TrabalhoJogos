@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="1" nextlayerid="3" nextobjectid="1">
+ <imagelayer id="2" name="Camada de Imagens 1" offsetx="-5.33333" offsety="6.66667" repeatx="1" repeaty="1">
+  <image source="Purple Nebula 6 - 1024x1024.png" width="1024" height="1024"/>
+ </imagelayer>
+</map>
