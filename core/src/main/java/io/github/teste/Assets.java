@@ -14,6 +14,7 @@ public abstract class Assets {
     public static final String SOM_TIRO = "data/PIU.wav";
     public static final String SOM_MORTE = "data/morte.wav";
     public static final String DIALOG_BOX = "dialogbox.png";
+    public static final String MENU_BACKGROUND = "menu_background.jpeg"; // New background asset
 
     public static void loadAll() {
         manager.load(FUNDO, Texture.class);
@@ -23,6 +24,7 @@ public abstract class Assets {
         manager.load(DIALOG_BOX, Texture.class);
         manager.load(SOM_TIRO, Sound.class);
         manager.load(SOM_MORTE, Sound.class);
+        manager.load(MENU_BACKGROUND, Texture.class);
     }
 
     // Liberta a memória de vídeo e áudio do sistema operativo
@@ -30,4 +32,3 @@ public abstract class Assets {
         manager.dispose();
     }
 }
-

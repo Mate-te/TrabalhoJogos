@@ -14,8 +14,8 @@ public class Bullet extends GameEntity implements Pool.Poolable { // Changed to 
     private final float speed = 500f;
 
     public Bullet(Texture texture) {
-        super(texture); // Call to GameEntity constructor
-        setAlive(false); // Bullets are not alive by default when created, they are activated from the pool
+        super(texture);
+        setAlive(false);
         setSize(32, 32);
         setOriginCenter(); // Define o centro para rotação da sprite da bala
     }

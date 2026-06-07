@@ -32,7 +32,8 @@ public class LoadingScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         if (Assets.manager.update()) {
-            game.setScreen(new GameScreen(game));
+            // After loading, transition to the MenuScreen
+            game.setScreen(new MenuScreen((Main) game)); // Cast to Main as MenuScreen expects it
             return;
         }
 
