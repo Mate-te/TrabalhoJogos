@@ -3,6 +3,7 @@ package io.github.teste;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
 
 public class HeroInputManager implements InputProcessor {
     private Hero hero;
@@ -13,6 +14,11 @@ public class HeroInputManager implements InputProcessor {
     private boolean moveRight = false;
     private boolean moveUp = false;
     private boolean moveDown = false;
+
+    private float zoomLevel = 1f;
+    private final float MIN_ZOOM = 0.5f;
+    private final float MAX_ZOOM = 1f;
+    private final float ZOOM_SPEED = 0.1f;
 
     public HeroInputManager(Hero hero, World world, Texture heroTexture) {
         this.hero = hero;
@@ -104,6 +110,21 @@ public class HeroInputManager implements InputProcessor {
     public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
     @Override
     public boolean mouseMoved(int screenX, int screenY) { return false; }
+
     @Override
-    public boolean scrolled(float amountX, float amountY) { return false; }
+    public boolean scrolled(float amountX, float amountY) {
+        if (amountY > 0) {
+            zoomLevel -= ZOOM_SPEED;
+        } else if (amountY < 0) {
+            zoomLevel += ZOOM_SPEED;
+        }
+
+        zoomLevel = MathUtils.clamp(zoomLevel, MIN_ZOOM, MAX_ZOOM);
+
+        return true;
+    }
+
+    public float getZoomLevel() {
+        return zoomLevel;
+    }
 }

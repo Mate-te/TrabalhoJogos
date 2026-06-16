@@ -28,8 +28,8 @@ public class GameScreen implements Screen {
     private OrthogonalTiledMapRenderer tmr;
     private TiledMap tiledMap;
 
-    // Câmara ortográfica necessária para converter coordenadas do rato para o mundo
     private OrthographicCamera camera;
+    private OrthographicCamera uiCamera; // Câmera para a HUD (sem zoom)
     private Vector3 mousePosTemp;
 
     public GameScreen(Game game) {
@@ -38,10 +38,14 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
         font = new BitmapFont();
 
-
         // Inicialização da câmara com as dimensões virtuais da janela gráfica
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        // Câmera UI que não sofre zoom (sempre 1:1)
+        uiCamera = new OrthographicCamera();
+        uiCamera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
         mousePosTemp = new Vector3();
 
         // Recuperação dos assets carregados no
@@ -95,11 +99,11 @@ public class GameScreen implements Screen {
             float heroY = hero.getY() + hero.getHeight() / 2f;
             speechBubble.updateFollowPosition(heroX, heroY);
         }
-        // Lógica de rotação do herói em direção ao cursor do rato
+
+        camera.zoom = heroInputManager.getZoomLevel();
+
         if (hero.isAlive()) {
-            // Captura a posição do rato na tela
             mousePosTemp.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            // Inverte o eixo Y da tela para coincidir com o sistema de coordenadas do mundo (unproject)
             camera.unproject(mousePosTemp);
 
             // Calcula o arco tangente diferencial entre o centro do herói e o vetor do rato
@@ -116,7 +120,7 @@ public class GameScreen implements Screen {
             hero.setRotation(anguloGraus);
         }
 
-        // Atualiza as matrizes da câmara e vincula-as ao SpriteBatch antes do início do desenho
+        // ===== RENDERIZAR MUNDO (COM ZOOM) =====
         camera.update();
 
         tmr.setView(camera);
@@ -124,7 +128,6 @@ public class GameScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
-
 
         if (world.getHero().isAlive()) {
             world.getHero().draw(batch);
@@ -138,27 +141,40 @@ public class GameScreen implements Screen {
             alien.draw(batch);
         }
 
+        speechBubble.draw(batch);
+
+        batch.end();
+
+        // ===== RENDERIZAR HUD (SEM ZOOM) =====
+        // Atualiza e aplica a câmera UI
+        uiCamera.update();
+        batch.setProjectionMatrix(uiCamera.combined);
+
+        batch.begin();
+
         // Renderização do temporizador
         float elapsedTime = world.getElapsedTime();
         int minutes = (int)(elapsedTime / 60f);
         int seconds = (int)(elapsedTime % 60f);
         int milliseconds = (int)((elapsedTime % 1f) * 1000f);
         String timeText = String.format("%02d:%02d:%03d", minutes, seconds, milliseconds);
-        font.draw(batch, timeText, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 20);
+        font.draw(batch, timeText, Gdx.graphics.getWidth() - 150, Gdx.graphics.getHeight() - 20);
 
         int lives = world.getHero().getLives();
         String livesText = "Vidas: " + lives;
         font.draw(batch, livesText, 20, Gdx.graphics.getHeight() - 20);
-        speechBubble.draw(batch);
-
 
         batch.end();
+        // ===== FIM HUD =====
     }
 
     @Override
     public void resize(int width, int height) {
-        // Atualiza o viewport da câmara caso a janela seja redimensionada
+        // Atualiza o viewport da câmara de jogo
         camera.setToOrtho(false, width, height);
+
+        // Atualiza o viewport da câmara UI
+        uiCamera.setToOrtho(false, width, height);
     }
 
     @Override
