@@ -17,6 +17,10 @@ public class Hero extends GameEntity { // Changed to extend GameEntity
     private float lastHitTime = 0f;
     private final float hitCooldown = 1f; // 1 segundo entre danos
 
+    // World bounds (em pixels). Se 0, usa as dimensões da tela como fallback.
+    private float worldWidth = 0f;
+    private float worldHeight = 0f;
+
     public Hero(Texture texture, Sound deathSound) {
         super(texture); // Call to GameEntity constructor
         this.deathSound = deathSound;
@@ -44,14 +48,22 @@ public class Hero extends GameEntity { // Changed to extend GameEntity
 
         setPosition(getX() + velocityX * delta, getY() + velocityY * delta);
 
+        float maxX = (worldWidth > 0f) ? worldWidth : Gdx.graphics.getWidth();
+        float maxY = (worldHeight > 0f) ? worldHeight : Gdx.graphics.getHeight();
+
         if (getX() < 0) setX(0);
-        if (getX() + getWidth() > Gdx.graphics.getWidth()) {
-            setX(Gdx.graphics.getWidth() - getWidth());
+        if (getX() + getWidth() > maxX) {
+            setX(maxX - getWidth());
         }
         if (getY() < 0) setY(0);
-        if (getY() + getHeight() > Gdx.graphics.getHeight()) {
-            setY(Gdx.graphics.getHeight() - getHeight());
+        if (getY() + getHeight() > maxY) {
+            setY(maxY - getHeight());
         }
+    }
+
+    public void setWorldBounds(float width, float height) {
+        this.worldWidth = width;
+        this.worldHeight = height;
     }
 
     public void takeDamage() {

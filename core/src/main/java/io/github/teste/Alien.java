@@ -5,7 +5,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Pool;
 
-public class Alien extends GameEntity implements Pool.Poolable { // Changed to extend GameEntity
+public class Alien extends GameEntity implements Pool.Poolable {
+
+    private float mapWidth = 0f;
+    private float mapHeight = 0f;
 
     public Alien(Texture texture) {
         super(texture);
@@ -14,42 +17,35 @@ public class Alien extends GameEntity implements Pool.Poolable { // Changed to e
     }
 
     public void init(float posX, float posY) {
-
-        // centraliza o sprite
         setPosition(
             posX - getWidth() / 2f,
             posY - getHeight() / 2f
         );
+        setAlive(true);
+    }
 
-        setAlive(true); // Use setAlive from GameEntity
+    public void setMapBounds(float width, float height) {
+        this.mapWidth = width;
+        this.mapHeight = height;
     }
 
     @Override
     public void reset() {
-
         setPosition(0, 0);
-
-        setAlive(false); // Use setAlive from GameEntity
+        setAlive(false);
     }
 
-    @Override // Mark as override since it's now in GameEntity
+    @Override
     public void update(float delta) {
-
-        if (isOutOfScreen()) {
-
-            setAlive(false); // Use setAlive from GameEntity
-
+        if (isOutOfBounds()) {
+            setAlive(false);
         } else {
-
-            // move para esquerda
             translateX(-400 * delta);
         }
     }
 
-    private boolean isOutOfScreen() {
-
-        return getX() < -100;
+    private boolean isOutOfBounds() {
+        float maxX = (mapWidth > 0f) ? mapWidth : Gdx.graphics.getWidth();
+        return getX() < -100 && getX() > maxX + 100;
     }
-
-    // isAlive() and setAlive() methods removed as they are inherited from GameEntity
 }

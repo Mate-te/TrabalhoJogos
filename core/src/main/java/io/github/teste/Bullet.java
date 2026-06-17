@@ -10,14 +10,16 @@ import com.badlogic.gdx.math.MathUtils;
 public class Bullet extends GameEntity implements Pool.Poolable { // Changed to extend GameEntity
 
     private Sound som;
-    private float angle; // Adicionado para controle de vetor
+    private float angle;
     private final float speed = 500f;
+    private float mapWidth = 0f;
+    private float mapHeight = 0f;
 
     public Bullet(Texture texture) {
         super(texture);
         setAlive(false);
-        setSize(32, 32);
-        setOriginCenter(); // Define o centro para rotação da sprite da bala
+        setSize(64, 64);
+        setOriginCenter();
     }
 
     public void init(float posX, float posY, float angleDeg) {
@@ -27,7 +29,12 @@ public class Bullet extends GameEntity implements Pool.Poolable { // Changed to 
         );
         this.angle = angleDeg;
         setRotation(angleDeg);
-        setAlive(true); // Use setAlive from GameEntity
+        setAlive(true);
+    }
+
+    public void setMapBounds(float width, float height) {
+        this.mapWidth = width;
+        this.mapHeight = height;
     }
 
     @Override
@@ -35,26 +42,25 @@ public class Bullet extends GameEntity implements Pool.Poolable { // Changed to 
         setPosition(0, 0);
         setRotation(0);
         this.angle = 0f;
-        setAlive(false); // Use setAlive from GameEntity
+        setAlive(false);
     }
 
-    @Override // Mark as override since it's now in GameEntity
+    @Override
     public void update(float delta) {
-        if (isOutOfScreen()) {
-            setAlive(false); // Use setAlive from GameEntity
+        if (isOutOfBounds()) {
+            setAlive(false);
         } else {
-            // Movimentação baseada no ângulo trigonométrico
             translateX(MathUtils.cosDeg(angle) * speed * delta);
             translateY(MathUtils.sinDeg(angle) * speed * delta);
         }
     }
 
-    private boolean isOutOfScreen() {
-        return getX() > Gdx.graphics.getWidth() + 100 || getX() < -100 ||
-            getY() > Gdx.graphics.getHeight() + 100 || getY() < -100;
+    private boolean isOutOfBounds() {
+        float maxX = (mapWidth > 0f) ? mapWidth : Gdx.graphics.getWidth();
+        float maxY = (mapHeight > 0f) ? mapHeight : Gdx.graphics.getHeight();
+        return getX() > maxX + 100 || getX() < -100 ||
+               getY() > maxY + 100 || getY() < -100;
     }
-
-    // isAlive() and setAlive() methods removed as they are inherited from GameEntity
 
     public Sound getSom() {
         return som;

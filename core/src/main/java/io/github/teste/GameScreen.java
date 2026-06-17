@@ -10,7 +10,10 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 
@@ -31,6 +34,10 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private OrthographicCamera uiCamera; // Câmera para a HUD (sem zoom)
     private Vector3 mousePosTemp;
+
+    // Dimensões do mapa (em pixels) - defina aqui o tamanho maior que a tela
+    private final float mapWidthPx = 3000f;  // 3x a tela
+    private final float mapHeightPx = 3000f; // 3x a tela
 
     public GameScreen(Game game) {
         this.game = game;
@@ -77,7 +84,11 @@ public class GameScreen implements Screen {
         float centerY = camera.position.y;
         speechBubble.showCentered("Vamos salvar o mundo!", 3f, centerX, centerY);
 
-        world = new World(hero);
+        // informa os limites do mundo ao herói para que os clamps usem o tamanho do mapa
+        hero.setWorldBounds(mapWidthPx, mapHeightPx);
+
+        // Cria o mundo e passa as dimensões do mapa para controle de spawns e lógica
+        world = new World(hero, mapWidthPx, mapHeightPx);
 
         heroInputManager = new HeroInputManager(hero, world, heroIMG);
         hero.setInputManager(heroInputManager);
@@ -118,6 +129,18 @@ public class GameScreen implements Screen {
             // Converte o radiano resultante para graus angulares exigidos pelo Sprite do LibGDX
             float anguloGraus = anguloRadianos * MathUtils.radDeg;
             hero.setRotation(anguloGraus);
+
+            // Câmera segue o herói
+            float heroCenterX = hero.getX() + hero.getWidth() / 2f;
+            float heroCenterY = hero.getY() + hero.getHeight() / 2f;
+            camera.position.x = heroCenterX;
+            camera.position.y = heroCenterY;
+            
+            // Clamp da câmera aos limites do mapa
+            float halfWidth = camera.viewportWidth / 2f;
+            float halfHeight = camera.viewportHeight / 2f;
+            camera.position.x = MathUtils.clamp(camera.position.x, halfWidth, mapWidthPx - halfWidth);
+            camera.position.y = MathUtils.clamp(camera.position.y, halfHeight, mapHeightPx - halfHeight);
         }
 
         // ===== RENDERIZAR MUNDO (COM ZOOM) =====

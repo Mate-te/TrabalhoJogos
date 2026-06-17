@@ -1,6 +1,5 @@
 package io.github.teste;
 
-
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.Gdx;
@@ -29,6 +28,10 @@ public class World {
 
     private Hero hero;
 
+    // Dimensoes do mapa em pixels (usadas para limites e spawns)
+    private float mapWidth = 0f;
+    private float mapHeight = 0f;
+
     private float alienSpawnTimer = 0f;
     private float elapsedTime = 0f;
 
@@ -37,8 +40,10 @@ public class World {
     private final float timeToReachMin = 60f;
     private final float spawnDecreaseRate = (initialAlienSpawnInterval - minAlienSpawnInterval) / timeToReachMin;
 
-    public World(Hero hero) {
+    public World(Hero hero, float mapWidth, float mapHeight) {
         this.hero = hero;
+        this.mapWidth = mapWidth;
+        this.mapHeight = mapHeight;
         this.alienTexture = Assets.manager.get(Assets.ALIEN, Texture.class);
         this.bulletTexture = Assets.manager.get(Assets.BULLET, Texture.class);
     }
@@ -80,14 +85,17 @@ public class World {
 
     private void spawnAlien() {
         Alien alien = alienPool.obtain();
-        float x = Gdx.graphics.getWidth() + 50;
-        float y = MathUtils.random(50, Gdx.graphics.getHeight() - 50);
+        alien.setMapBounds(mapWidth, mapHeight);
+        float x = (mapWidth > 0f) ? mapWidth + 50f : Gdx.graphics.getWidth() + 50f;
+        float yMax = (mapHeight > 100f) ? mapHeight - 50f : Math.max(Gdx.graphics.getHeight() - 50f, 50f);
+        float y = MathUtils.random(50f, yMax);
         alien.init(x, y);
         activeAliens.add(alien);
     }
 
     public void shoot(float x, float y, float angleDeg) {
         Bullet bullet = bulletPool.obtain();
+        bullet.setMapBounds(mapWidth, mapHeight);
         bullet.init(x, y, angleDeg);
         activeBullets.add(bullet);
 
