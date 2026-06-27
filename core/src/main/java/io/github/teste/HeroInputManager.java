@@ -87,6 +87,15 @@ public class HeroInputManager implements InputProcessor {
 
         hero.setVelocityX(vx);
         hero.setVelocityY(vy);
+
+        // Troca o sprite para dar impressão de movimento quando o herói está se movendo
+        if (vx != 0f || vy != 0f) {
+            // Use a textura "NAVELFOGO" enquanto se move
+            hero.setTexture(Assets.manager.get(Assets.NAVELFOGO, com.badlogic.gdx.graphics.Texture.class));
+        } else {
+            // Texto estática quando parado
+            hero.setTexture(Assets.manager.get(Assets.NAVE, com.badlogic.gdx.graphics.Texture.class));
+        }
     }
 
     @Override

@@ -65,11 +65,12 @@ public class GameScreen implements Screen {
         // Esta string DEVE ser idêntica à que está no Assets.manager.load() do LoadingScreen
         heroIMG = Assets.manager.get(Assets.NAVE, Texture.class);
         bullet = Assets.manager.get(Assets.BULLET, Texture.class);
+        Texture particleTexture = Assets.manager.get(Assets.PARTICLE, Texture.class);
 
         com.badlogic.gdx.audio.Sound shootSound = Assets.manager.get(Assets.SOM_TIRO, com.badlogic.gdx.audio.Sound.class);
         com.badlogic.gdx.audio.Sound deathSound = Assets.manager.get(Assets.SOM_MORTE, com.badlogic.gdx.audio.Sound.class);
 
-        hero = new Hero(heroIMG, deathSound);
+        hero = new Hero(heroIMG, deathSound, particleTexture);
         // Define o centro do sprite como o ponto de origem para a rotação
         hero.setOriginCenter();
         hero.init(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f);
@@ -154,6 +155,8 @@ public class GameScreen implements Screen {
 
         if (world.getHero().isAlive()) {
             world.getHero().draw(batch);
+            // Renderiza as partículas de fogo atrás da nave
+            world.getHero().getFireEmitter().draw(batch);
         }
 
         for (Bullet bullet : world.getActiveBullets()) {

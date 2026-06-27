@@ -10,6 +10,7 @@ public abstract class Assets {
 
     public static final String FUNDO = "fundojpeg.jpeg";
     public static final String NAVE = "naveL.png";
+    public static final String NAVELFOGO = "NAVELFOGO.png";
     public static final String ALIEN = "demo.png";
     public static final String BULLET = "bullet.png";
     public static final String SOM_TIRO = "data/PIU.wav";
@@ -17,10 +18,12 @@ public abstract class Assets {
     public static final String DIALOG_BOX = "dialogbox.png";
     public static final String MENU_BACKGROUND = "menu_background.jpeg"; // New background asset
     public static final String MAPA = "mapa.tmx";
+    public static final String PARTICLE = "particles/particle.png";
 
     public static void loadAll() {
         manager.load(FUNDO, Texture.class);
         manager.load(NAVE, Texture.class);
+        manager.load(NAVELFOGO, Texture.class);
         manager.load(ALIEN, Texture.class);
         manager.load(BULLET, Texture.class);
         manager.load(DIALOG_BOX, Texture.class);
@@ -31,6 +34,7 @@ public abstract class Assets {
         manager.load(MAPA, TiledMap.class);
 
         manager.load(MENU_BACKGROUND, Texture.class);
+        manager.load(PARTICLE, Texture.class);
     }
 
     // Liberta a memória de vídeo e áudio do sistema operativo
