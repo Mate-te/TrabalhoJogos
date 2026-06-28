@@ -12,6 +12,7 @@ public abstract class Assets {
     public static final String NAVE = "naveL.png";
     public static final String NAVELFOGO = "NAVELFOGO.png";
     public static final String ALIEN = "demo.png";
+    public static final String ALIEN_SPRITESHEET = "ufo_spritesheet.png";
     public static final String BULLET = "bullet.png";
     public static final String SOM_TIRO = "data/PIU.wav";
     public static final String SOM_MORTE = "data/morte.wav";
@@ -25,6 +26,7 @@ public abstract class Assets {
         manager.load(NAVE, Texture.class);
         manager.load(NAVELFOGO, Texture.class);
         manager.load(ALIEN, Texture.class);
+        manager.load(ALIEN_SPRITESHEET, Texture.class);
         manager.load(BULLET, Texture.class);
         manager.load(DIALOG_BOX, Texture.class);
         manager.load(SOM_TIRO, Sound.class);

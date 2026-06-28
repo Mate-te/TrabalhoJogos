@@ -44,7 +44,7 @@ public class World {
         this.hero = hero;
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
-        this.alienTexture = Assets.manager.get(Assets.ALIEN, Texture.class);
+        this.alienTexture = Assets.manager.get(Assets.ALIEN_SPRITESHEET, Texture.class);
         this.bulletTexture = Assets.manager.get(Assets.BULLET, Texture.class);
     }
 
