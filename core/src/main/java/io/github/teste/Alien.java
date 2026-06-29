@@ -58,18 +58,39 @@ public class Alien extends GameEntity implements Pool.Poolable {
 
     @Override
     public void update(float delta) {
-        if (isOutOfBounds()) {
-            setAlive(false);
-        } else {
-            translateX(-400 * delta);
+        // Atualiza a animação
+        animationTimer += delta;
+        if (animationTimer >= frameDuration) {
+            animationTimer -= frameDuration;
+            currentFrameIndex = (currentFrameIndex + 1) % 3;
+        }
+    }
 
-            // Atualiza a animação
-            animationTimer += delta;
-            if (animationTimer >= frameDuration) {
-                animationTimer -= frameDuration;
-                currentFrameIndex = (currentFrameIndex + 1) % 3;
+    public void update(float delta, Hero hero) {
+    if (hero != null && hero.isAlive()) {
+            // Calcula o centro do Alien
+            float alienCenterX = getX() + getWidth() / 2f;
+            float alienCenterY = getY() + getHeight() / 2f;
+            // Calcula o centro do Hero
+            float heroCenterX = hero.getX() + hero.getWidth() / 2f;
+            float heroCenterY = hero.getY() + hero.getHeight() / 2f;
+            // Calcula a distância entre os eixos (vetor de direção)
+            float dx = heroCenterX - alienCenterX;
+            float dy = heroCenterY - alienCenterY;
+            // Calcula a distância total usando o Teorema de Pitágoras
+            float distance = (float) Math.sqrt(dx * dx + dy * dy);
+            // Se houver distância, normaliza o vetor (transforma num valor de 0 a 1) e aplica a velocidade
+            if (distance > 0) {
+                dx /= distance;
+                dy /= distance;
+
+                float speed = 150f; // Velocidade definida
+                translateX(dx * speed * delta);
+                translateY(dy * speed * delta);
             }
         }
+        // Chama o update padrão acima para garantir que a animação continue rodando
+        update(delta);
     }
 
     public void draw(SpriteBatch batch) {
@@ -81,10 +102,5 @@ public class Alien extends GameEntity implements Pool.Poolable {
                 getScaleX(), getScaleY(),
                 getRotation());
         }
-    }
-
-    private boolean isOutOfBounds() {
-        float maxX = (mapWidth > 0f) ? mapWidth : Gdx.graphics.getWidth();
-        return getX() < -100 && getX() > maxX + 100;
     }
 }

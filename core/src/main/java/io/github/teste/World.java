@@ -64,7 +64,7 @@ public class World {
 
         for (int i = activeAliens.size; --i >= 0;) {
             Alien alien = activeAliens.get(i);
-            alien.update(delta);
+            alien.update(delta, hero);
             if (!alien.isAlive()) {
                 activeAliens.removeIndex(i);
                 alienPool.free(alien);
@@ -86,9 +86,21 @@ public class World {
     private void spawnAlien() {
         Alien alien = alienPool.obtain();
         alien.setMapBounds(mapWidth, mapHeight);
-        float x = (mapWidth > 0f) ? mapWidth + 50f : Gdx.graphics.getWidth() + 50f;
-        float yMax = (mapHeight > 100f) ? mapHeight - 50f : Math.max(Gdx.graphics.getHeight() - 50f, 50f);
-        float y = MathUtils.random(50f, yMax);
+
+        // Define o raio de spawn (metade da diagonal ou largura/altura garantem que esteja fora da tela)
+        float spawnRadius = Math.max(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        // Escolhe um ângulo aleatório em radianos (de 0 a 2*PI)
+        float angle = MathUtils.random(0f, MathUtils.PI2);
+
+        // Pega o centro do herói (ou o meio do mapa caso o herói não exista)
+        float heroX = hero != null ? hero.getX() + hero.getWidth() / 2f : mapWidth / 2f;
+        float heroY = hero != null ? hero.getY() + hero.getHeight() / 2f : mapHeight / 2f;
+
+        // Calcula a nova posição X e Y baseada no ângulo e raio
+        float x = heroX + MathUtils.cos(angle) * spawnRadius;
+        float y = heroY + MathUtils.sin(angle) * spawnRadius;
+
         alien.init(x, y);
         activeAliens.add(alien);
     }
