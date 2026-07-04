@@ -20,12 +20,14 @@ public abstract class Assets {
     public static final String MENU_BACKGROUND = "menu_background.jpeg"; // New background asset
     public static final String MAPA = "mapa.tmx";
     public static final String PARTICLE = "particles/particle.png";
+    public static final String ENEMY_JF_SPRITESHEET = "jellyfish-large-Sheet.png"; // ou o nome do seu arquivo
 
     public static void loadAll() {
         manager.load(FUNDO, Texture.class);
         manager.load(NAVE, Texture.class);
         manager.load(NAVELFOGO, Texture.class);
         manager.load(ALIEN, Texture.class);
+        manager.load(ENEMY_JF_SPRITESHEET, Texture.class);
         manager.load(ALIEN_SPRITESHEET, Texture.class);
         manager.load(BULLET, Texture.class);
         manager.load(DIALOG_BOX, Texture.class);

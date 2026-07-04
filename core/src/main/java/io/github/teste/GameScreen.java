@@ -10,10 +10,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 
@@ -136,7 +133,7 @@ public class GameScreen implements Screen {
             float heroCenterY = hero.getY() + hero.getHeight() / 2f;
             camera.position.x = heroCenterX;
             camera.position.y = heroCenterY;
-            
+
             // Clamp da câmera aos limites do mapa
             float halfWidth = camera.viewportWidth / 2f;
             float halfHeight = camera.viewportHeight / 2f;
@@ -165,6 +162,10 @@ public class GameScreen implements Screen {
 
         for (Alien alien : world.getActiveAliens()) {
             alien.draw(batch);
+        }
+
+        for (EnemyJF ship : world.getActiveEnemyJF()) {
+            ship.draw(batch);
         }
 
         speechBubble.draw(batch);

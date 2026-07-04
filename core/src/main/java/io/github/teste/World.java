@@ -2,9 +2,7 @@ package io.github.teste;
 
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.MathUtils;
 
 public class World {
 
@@ -32,9 +30,9 @@ public class World {
         this.mapHeight = mapHeight;
         this.bulletTexture = Assets.manager.get(Assets.BULLET, Texture.class);
         Texture alienTexture = Assets.manager.get(Assets.ALIEN_SPRITESHEET, Texture.class);
+        Texture enemyJFTexture = Assets.manager.get(Assets.ENEMY_JF_SPRITESHEET, Texture.class); // nova textura
 
-        this.enemyManager = new EnemyManager(alienTexture, mapWidth, mapHeight);
-
+        this.enemyManager = new EnemyManager(alienTexture, enemyJFTexture, mapWidth, mapHeight);
     }
 
     public void update(float delta) {
@@ -79,7 +77,23 @@ public class World {
                 Alien alien = enemyManager.getActiveAliens().get(j);
                 if (bullet.getBoundingRectangle().overlaps(alien.getBoundingRectangle())) {
                     bullet.setAlive(false);
-                    alien.setAlive(false);
+                    if (alien instanceof Boss) {
+                        ((Boss) alien).takeDamage();
+                    } else {
+                        alien.setAlive(false);
+                    }
+                }
+            }
+        }
+
+        // Colisão: Tiros x Enemy JF (NOVO)
+        for (int i = activeBullets.size; --i >= 0;) {
+            Bullet bullet = activeBullets.get(i);
+            for (int j = enemyManager.getActiveEnemyJF().size; --j >= 0;) {
+                EnemyJF JF = enemyManager.getActiveEnemyJF().get(j);
+                if (bullet.getBoundingRectangle().overlaps(JF.getBoundingRectangle())) {
+                    bullet.setAlive(false);
+                    JF.takeDamage(); // 3 tiros para matar
                 }
             }
         }
@@ -92,10 +106,20 @@ public class World {
                 hero.takeDamage();
             }
         }
+
+        // Colisão: Hero x Enemy JF (NOVO)
+        for (int j = enemyManager.getActiveEnemyJF().size; --j >= 0;) {
+            EnemyJF JF = enemyManager.getActiveEnemyJF().get(j);
+            if (hero != null && hero.isAlive() && hero.getBoundingRectangle().overlaps(JF.getBoundingRectangle())) {
+                JF.setAlive(false);
+                hero.takeDamage();
+            }
+        }
     }
 
     public Array<Bullet> getActiveBullets() { return activeBullets; }
     public Array<Alien> getActiveAliens() { return enemyManager.getActiveAliens(); }
+    public Array<EnemyJF> getActiveEnemyJF() { return enemyManager.getActiveEnemyJF(); }
     public Hero getHero() { return hero; }
     public float getElapsedTime() { return elapsedTime; }
 }
