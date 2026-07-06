@@ -69,7 +69,7 @@ public class EnemyManager {
 
         if (alienSpawnTimer >= currentSpawnInterval) {
             spawnAlien(hero);
-            alienSpawnTimer = 0f;
+            alienSpawnTimer = alienSpawnTimer -currentSpawnInterval;
         }
 
         // --- boss spawn a cada bossSpawnInterval segundos ---
