@@ -32,6 +32,8 @@ public class GameScreen implements Screen {
     private OrthographicCamera uiCamera; // Câmera para a HUD (sem zoom)
     private Vector3 mousePosTemp;
 
+    private HUD hud;
+
     // Dimensões do mapa (em pixels) - defina aqui o tamanho maior que a tela
     private final float mapWidthPx = 3000f;  // 3x a tela
     private final float mapHeightPx = 3000f; // 3x a tela
@@ -81,6 +83,11 @@ public class GameScreen implements Screen {
         float centerX = camera.position.x; // usa a posição da câmera (funciona se a câmera se mover)
         float centerY = camera.position.y;
         speechBubble.showCentered("Vamos salvar o mundo!", 3f, centerX, centerY);
+
+        // Inicializa a HUD com corações e timer
+        Texture heartFullTex = Assets.manager.get(Assets.HEART_FULL, Texture.class);
+        Texture heartEmptyTex = Assets.manager.get(Assets.HEART_EMPTY, Texture.class);
+        hud = new HUD(heartFullTex, heartEmptyTex, font);
 
         // informa os limites do mundo ao herói para que os clamps usem o tamanho do mapa
         hero.setWorldBounds(mapWidthPx, mapHeightPx);
@@ -179,17 +186,10 @@ public class GameScreen implements Screen {
 
         batch.begin();
 
-        // Renderização do temporizador
+        // Renderização da HUD (corações e timer)
         float elapsedTime = world.getElapsedTime();
-        int minutes = (int)(elapsedTime / 60f);
-        int seconds = (int)(elapsedTime % 60f);
-        int milliseconds = (int)((elapsedTime % 1f) * 1000f);
-        String timeText = String.format("%02d:%02d:%03d", minutes, seconds, milliseconds);
-        font.draw(batch, timeText, Gdx.graphics.getWidth() - 150, Gdx.graphics.getHeight() - 20);
-
         int lives = world.getHero().getLives();
-        String livesText = "Vidas: " + lives;
-        font.draw(batch, livesText, 20, Gdx.graphics.getHeight() - 20);
+        hud.draw(batch, lives, elapsedTime, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         batch.end();
         // ===== FIM HUD =====

@@ -21,6 +21,8 @@ public abstract class Assets {
     public static final String MAPA = "mapa.tmx";
     public static final String PARTICLE = "particles/particle.png";
     public static final String ENEMY_JF_SPRITESHEET = "jellyfish-large-Sheet.png"; // ou o nome do seu arquivo
+    public static final String HEART_FULL = "heart.png";
+    public static final String HEART_EMPTY = "background.png";
 
     public static void loadAll() {
         manager.load(FUNDO, Texture.class);
@@ -39,6 +41,8 @@ public abstract class Assets {
 
         manager.load(MENU_BACKGROUND, Texture.class);
         manager.load(PARTICLE, Texture.class);
+        manager.load(HEART_FULL, Texture.class);
+        manager.load(HEART_EMPTY, Texture.class);
     }
 
     // Liberta a memória de vídeo e áudio do sistema operativo

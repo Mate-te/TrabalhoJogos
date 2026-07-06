@@ -74,15 +74,15 @@ public class Hero extends GameEntity { // Changed to extend GameEntity
         // Atualiza posição do emitter (parte traseira da nave, meio-esquerda)
         float heroCenterX = getX() + getWidth() / 2f;
         float heroCenterY = getY() + getHeight() / 2f;
-        
+
         // Calcula o offset baseado na rotação da nave
         float rotationRad = getRotation() * com.badlogic.gdx.math.MathUtils.degreesToRadians;
         float offsetDistance = getWidth() / 2.5f; // Distância do centro até a traseira
-        
+
         // Offset na direção oposta à frente da nave (rotação + 180°)
         float emitterX = heroCenterX + com.badlogic.gdx.math.MathUtils.cos(rotationRad + 3.14159f) * offsetDistance;
         float emitterY = heroCenterY + com.badlogic.gdx.math.MathUtils.sin(rotationRad + 3.14159f) * offsetDistance;
-        
+
         fireEmitter.setPosition(emitterX, emitterY);
         fireEmitter.setRotation(getRotation());
 
