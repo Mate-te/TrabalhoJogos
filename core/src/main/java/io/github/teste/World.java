@@ -79,8 +79,15 @@ public class World {
                     bullet.setAlive(false);
                     if (alien instanceof Boss) {
                         ((Boss) alien).takeDamage();
+                        // Só ganha ponto se o boss morrer
+                        if (!alien.isAlive() && hero != null) {
+                            hero.addScore(alien.getScoreValue());
+                        }
                     } else {
                         alien.setAlive(false);
+                        if (hero != null) {
+                            hero.addScore(alien.getScoreValue());
+                        }
                     }
                 }
             }
@@ -94,6 +101,11 @@ public class World {
                 if (bullet.getBoundingRectangle().overlaps(JF.getBoundingRectangle())) {
                     bullet.setAlive(false);
                     JF.takeDamage(); // 3 tiros para matar
+
+                    // Só ganha ponto se a água viva morrer (tem 3 de HP)
+                    if (!JF.isAlive() && hero != null) {
+                        hero.addScore(JF.getScoreValue());
+                    }
                 }
             }
         }

@@ -57,6 +57,10 @@ public class Alien extends GameEntity implements Pool.Poolable {
         return this.speed;
     }
 
+    public int getScoreValue() {
+        return 5;
+    }
+
     @Override
     public void reset() {
         setPosition(0, 0);

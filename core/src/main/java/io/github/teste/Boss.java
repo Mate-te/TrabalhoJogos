@@ -38,6 +38,11 @@ public class Boss extends Alien {
     }
 
     @Override
+    public int getScoreValue() {
+        return 500;
+    }
+
+    @Override
     public void reset() {
         super.reset();
         this.hp = maxHp;

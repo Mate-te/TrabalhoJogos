@@ -18,6 +18,10 @@ public class Hero extends GameEntity { // Changed to extend GameEntity
     private float lastHitTime = 0f;
     private final float hitCooldown = 1f; // 1 segundo entre danos
 
+    // Sistema de score
+    private int score = 0;
+    private int nextLifeThreshold = 100;
+
     // World bounds (em pixels). Se 0, usa as dimensões da tela como fallback.
     private float worldWidth = 0f;
     private float worldHeight = 0f;
@@ -49,6 +53,8 @@ public class Hero extends GameEntity { // Changed to extend GameEntity
         lastHitTime = 0f;
         velocityX = 0f;
         velocityY = 0f;
+        score = 0;
+        nextLifeThreshold = 100;
     }
 
     @Override
@@ -148,4 +154,20 @@ public class Hero extends GameEntity { // Changed to extend GameEntity
     public ParticleEmitter getFireEmitter() {
         return fireEmitter;
     }
+
+    public int getScore() {
+        return score;
+    }
+    public void addScore(int points) {
+        this.score += points;
+
+        // Verifica se o threshold foi alcançado
+        while (this.score >= nextLifeThreshold) {
+            if (lives < 5) {
+                lives++;
+            }
+            nextLifeThreshold += 100;
+        }
+    }
+
 }

@@ -58,6 +58,10 @@ public class EnemyJF extends GameEntity {
         this.speed = speed;
     }
 
+    public int getScoreValue() {
+        return 10;
+    }
+
     public void takeDamage(int amount) {
         if (!isAlive()) return;
         hp -= amount;

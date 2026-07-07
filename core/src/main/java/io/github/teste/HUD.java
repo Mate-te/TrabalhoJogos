@@ -22,10 +22,11 @@ public class HUD {
         this.font = font;
     }
 
-    public void draw(SpriteBatch batch, int lives, float elapsedTime, int currentWave, int maxWaves, float screenWidth, float screenHeight) {
+    public void draw(SpriteBatch batch, int lives, float elapsedTime, int currentWave, int maxWaves, int score, float screenWidth, float screenHeight) {
         drawHearts(batch, lives, screenHeight);
         drawTimer(batch, elapsedTime, screenWidth, screenHeight);
         drawWave(batch, currentWave, maxWaves, screenWidth, screenHeight);
+        drawScore(batch, score, screenWidth, screenHeight);
     }
 
     private void drawHearts(SpriteBatch batch, int currentLives, float screenHeight) {
@@ -54,5 +55,12 @@ public class HUD {
         String waveText = String.format("Wave %d / %d", currentWave, maxWaves);
 
         font.draw(batch, waveText, screenWidth - 150, screenHeight - PADDING_TOP - 20f);
+    }
+
+    private void drawScore(SpriteBatch batch, int score, float screenWidth, float screenHeight) {
+        String scoreText = String.format("Score: %04d", score);
+
+        // Posição ajustável logo abaixo da Wave
+        font.draw(batch, scoreText, screenWidth - 150, screenHeight - PADDING_TOP - 40f);
     }
 }

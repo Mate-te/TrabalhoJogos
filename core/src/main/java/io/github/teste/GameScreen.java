@@ -186,12 +186,13 @@ public class GameScreen implements Screen {
 
         batch.begin();
 
-        // Renderização da HUD (corações e timer)
+        // Renderização da HUD (corações, timer, wave e score)
         float elapsedTime = world.getElapsedTime();
         int lives = world.getHero().getLives();
         int currentWave = world.getCurrentWave();
         int maxWaves = world.getMaxWaves();
-        hud.draw(batch, lives, elapsedTime, currentWave, maxWaves, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        int score = world.getHero().getScore();
+        hud.draw(batch, lives, elapsedTime, currentWave, maxWaves, score, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         batch.end();
         // ===== FIM HUD =====
