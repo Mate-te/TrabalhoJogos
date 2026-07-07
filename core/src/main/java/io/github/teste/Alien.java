@@ -12,6 +12,8 @@ public class Alien extends GameEntity implements Pool.Poolable {
     private float mapWidth = 0f;
     private float mapHeight = 0f;
 
+    protected float speed = 150f;
+
     // Animação
     private TextureRegion[] frames;
     private float animationTimer = 0f;
@@ -46,6 +48,13 @@ public class Alien extends GameEntity implements Pool.Poolable {
     public void setMapBounds(float width, float height) {
         this.mapWidth = width;
         this.mapHeight = height;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+    public float getSpeed() {
+        return this.speed;
     }
 
     @Override

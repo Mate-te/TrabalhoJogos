@@ -15,21 +15,24 @@ public class EnemyManager {
     private final Pool<Boss> bossPool;
     private final Pool<EnemyJF> enemyJFPool;
     private final Array<EnemyJF> activeEnemyJF;
-    private float enemyJFSpawnTimer = 0f;
-    private final float enemyJFSpawnInterval = 2f; // spawn a cada 2 segundos (após 30s)
 
     private float mapWidth;
     private float mapHeight;
 
+    // --- Sistema de Waves ---
+    private int currentWave = 1;
+    private float waveTimer = 0f;
+    private final float WAVE_DURATION = 30f;
+    private final int MAX_WAVES = 5;
+    private boolean bossSpawned = false;
 
-    // Variáveis de controle de dificuldade e spawn
-    private float bossSpawnTimer = 0f;
-    private final float bossSpawnInterval = 60f; // 60 segundos
+    // Contadores de Spawn da Wave Atual
+    private int aliensSpawnedThisWave = 0;
+    private int jfSpawnedThisWave = 0;
+
+    // Timers individuais de spawn
     private float alienSpawnTimer = 0f;
-    private final float initialAlienSpawnInterval = 0.8f;
-    private final float minAlienSpawnInterval = 0.5f;
-    private final float timeToReachMin = 60f;
-    private final float spawnDecreaseRate = (initialAlienSpawnInterval - minAlienSpawnInterval) / timeToReachMin;
+    private float jfSpawnTimer = 0f;
 
     public EnemyManager(Texture alienTexture, Texture enemyShipTexture,float mapWidth, float mapHeight) {
         this.alienTexture = alienTexture;
@@ -49,11 +52,9 @@ public class EnemyManager {
         this.bossPool = new Pool<Boss>() {
             @Override
             protected Boss newObject() {
-                // usa a mesma textura por enquanto; idealmente tenha uma textura específica para boss
                 return new Boss(EnemyManager.this.alienTexture);
             }
         };
-
         this.enemyJFPool = new Pool<EnemyJF>() {
             @Override
             protected EnemyJF newObject() {
@@ -63,36 +64,57 @@ public class EnemyManager {
     }
 
     public void update(float delta, float elapsedTime, Hero hero) {
-        // Spawn normal de aliens (já existente)
-        float currentSpawnInterval = Math.max(minAlienSpawnInterval, initialAlienSpawnInterval - (elapsedTime * spawnDecreaseRate));
-        alienSpawnTimer += delta;
+        if (currentWave <= MAX_WAVES) {
+            waveTimer += delta;
 
-        if (alienSpawnTimer >= currentSpawnInterval) {
-            spawnAlien(hero);
-            alienSpawnTimer = alienSpawnTimer -currentSpawnInterval;
-        }
+            // Progressão de Wave (exceto na última, que dura até matar o boss)
+            if (waveTimer >= WAVE_DURATION && currentWave < MAX_WAVES) {
+                currentWave++;
+                waveTimer = 0f;
+                aliensSpawnedThisWave = 0;
+                jfSpawnedThisWave = 0;
+            }
+            // --- Lógica da Wave 5 (Final) ---
+            if (currentWave == MAX_WAVES && !bossSpawned) {
+                spawnBoss(hero);
+                bossSpawned = true;
+            }
+            // Cálculos dinâmicos dos limites da Wave Atual
+            int maxOnScreenTotal = currentWave * 10;
+            int maxOnScreenJF = (int) (maxOnScreenTotal * 0.3f);
+            int maxOnScreenAlien = maxOnScreenTotal - maxOnScreenJF;
+            int maxSpawnTotal = currentWave * 50;
+            int maxSpawnJF = (int) (maxSpawnTotal * 0.3f);
+            int maxSpawnAlien = maxSpawnTotal - maxSpawnJF;
+            // Base de velocidade aumenta até a Wave 3 (ex: Wave 1 = 150f, Wave 2 = 170f, Wave 3 = 190f)
+            float baseSpeed = 150f + (Math.min(currentWave, 3) - 1) * 20f;
+            // --- Spawner de Aliens ---
+            if (aliensSpawnedThisWave < maxSpawnAlien && getActiveNormalAliensCount() < maxOnScreenAlien) {
+                float alienSpawnInterval = WAVE_DURATION / maxSpawnAlien;
+                alienSpawnTimer += delta;
 
-        // --- boss spawn a cada bossSpawnInterval segundos ---
-        bossSpawnTimer += delta;
-        if (bossSpawnTimer >= bossSpawnInterval) {
-            spawnBoss(hero);
-            bossSpawnTimer = bossSpawnTimer-bossSpawnInterval;
-        }
+                if (alienSpawnTimer >= alienSpawnInterval) {
+                    spawnAlien(hero, baseSpeed);
+                    alienSpawnTimer -= alienSpawnInterval;
+                    aliensSpawnedThisWave++;
+                }
+            }
+            // --- Spawner de Jelly Fish (JF) ---
+            if (jfSpawnedThisWave < maxSpawnJF && activeEnemyJF.size < maxOnScreenJF) {
+                float jfSpawnInterval = WAVE_DURATION / maxSpawnJF;
+                jfSpawnTimer += delta;
 
-        // --- enemy ship spawn a partir de 30 segundos ---
-        if (elapsedTime >= 30f) {
-            enemyJFSpawnTimer += delta;
-            if (enemyJFSpawnTimer >= enemyJFSpawnInterval) {
-                spawnEnemyShip(hero);
-                enemyJFSpawnTimer = enemyJFSpawnTimer-enemyJFSpawnInterval;
+                if (jfSpawnTimer >= jfSpawnInterval) {
+                    spawnEnemyShip(hero, baseSpeed);
+                    jfSpawnTimer -= jfSpawnInterval;
+                    jfSpawnedThisWave++;
+                }
             }
         }
-
         // Atualiza todos os aliens vivos e limpa os mortos
         for (int i = activeAliens.size; --i >= 0;) {
             Alien alien = activeAliens.get(i);
             alien.update(delta, hero);
-
             if (!alien.isAlive()) {
                 activeAliens.removeIndex(i);
                 if (alien instanceof Boss) {
@@ -102,20 +124,28 @@ public class EnemyManager {
                 }
             }
         }
-
-        // Atualiza todos os enemy ships vivos e limpa os mortos
+        // Atualiza todos os JF vivos e limpa os mortos
         for (int i = activeEnemyJF.size; --i >= 0;) {
             EnemyJF ship = activeEnemyJF.get(i);
             ship.update(delta, hero);
-
             if (!ship.isAlive()) {
                 activeEnemyJF.removeIndex(i);
                 enemyJFPool.free(ship);
             }
         }
     }
+    // Auxiliar para não contar o Boss como "Alien Normal" nos limites da tela
+    private int getActiveNormalAliensCount() {
+        int count = 0;
+        for (Alien a : activeAliens) {
+            if (!(a instanceof Boss)) {
+                count++;
+            }
+        }
+        return count;
+    }
 
-    private void spawnAlien(Hero hero) {
+    private void spawnAlien(Hero hero, float speed) {
         Alien alien = alienPool.obtain();
         alien.setMapBounds(mapWidth, mapHeight);
 
@@ -131,6 +161,7 @@ public class EnemyManager {
         float y = heroY + MathUtils.sin(angle) * spawnRadius;
 
         alien.init(x, y);
+        alien.setSpeed(speed);
         activeAliens.add(alien);
     }
 
@@ -146,10 +177,11 @@ public class EnemyManager {
         float y = heroY + MathUtils.sin(angle) * spawnRadius;
 
         boss.init(x, y);
+        boss.setSpeed(60f);
         activeAliens.add(boss);
     }
 
-    private void spawnEnemyShip(Hero hero) {
+    private void spawnEnemyShip(Hero hero, float speed) {
         EnemyJF ship = enemyJFPool.obtain();
         ship.setMapBounds(mapWidth, mapHeight);
 
@@ -163,13 +195,11 @@ public class EnemyManager {
         float y = heroY + MathUtils.sin(angle) * spawnRadius;
 
         ship.init(x, y);
+        ship.setSpeed(speed);
         activeEnemyJF.add(ship);
     }
-    public Array<Alien> getActiveAliens() {
-        return activeAliens;
-    }
-
-    public Array<EnemyJF> getActiveEnemyJF() {
-        return activeEnemyJF;
-    }
+    public Array<Alien> getActiveAliens() { return activeAliens; }
+    public Array<EnemyJF> getActiveEnemyJF() { return activeEnemyJF; }
+    public int getCurrentWave() { return currentWave; }
+    public int getMaxWaves() { return MAX_WAVES; }
 }

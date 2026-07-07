@@ -6,6 +6,8 @@ public class Boss extends Alien {
     private final int maxHp = 100;
     private int hp;
 
+    private float speedIncreaseTimer = 0f;
+
     public Boss(Texture texture) {
         super(texture);
         setSize(128f, 128f);
@@ -45,6 +47,15 @@ public class Boss extends Alien {
 
     @Override
     public void update(float delta, Hero hero) {
+        if (isAlive()) {
+            // Aumenta a velocidade do boss em +5 a cada 5 segundos vivos
+            speedIncreaseTimer += delta;
+            if (speedIncreaseTimer >= 5f) {
+                setSpeed(getSpeed() + 5f);
+                speedIncreaseTimer -= 5f;
+            }
+        }
+
         if (hero != null && hero.isAlive()) {
             // Centro do boss
             float bossCenterX = getX() + getWidth() / 2f;
@@ -60,9 +71,9 @@ public class Boss extends Alien {
             if (distance > 0) {
                 dx /= distance;
                 dy /= distance;
-                float speed = 60f; // velocidade bem menor que o Alien comum (ex: 150f)
-                translateX(dx * speed * delta);
-                translateY(dy * speed * delta);
+
+                translateX(dx * this.speed * delta);
+                translateY(dy * this.speed * delta);
             }
         }
 

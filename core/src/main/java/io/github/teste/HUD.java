@@ -22,9 +22,10 @@ public class HUD {
         this.font = font;
     }
 
-    public void draw(SpriteBatch batch, int lives, float elapsedTime, float screenWidth, float screenHeight) {
+    public void draw(SpriteBatch batch, int lives, float elapsedTime, int currentWave, int maxWaves, float screenWidth, float screenHeight) {
         drawHearts(batch, lives, screenHeight);
         drawTimer(batch, elapsedTime, screenWidth, screenHeight);
+        drawWave(batch, currentWave, maxWaves, screenWidth, screenHeight);
     }
 
     private void drawHearts(SpriteBatch batch, int currentLives, float screenHeight) {
@@ -41,11 +42,17 @@ public class HUD {
     }
 
     private void drawTimer(SpriteBatch batch, float elapsedTime, float screenWidth, float screenHeight) {
-        int minutes = (int)(elapsedTime / 60f);
-        int seconds = (int)(elapsedTime % 60f);
-        int milliseconds = (int)((elapsedTime % 1f) * 1000f);
+        int minutes = (int) (elapsedTime / 60f);
+        int seconds = (int) (elapsedTime % 60f);
+        int milliseconds = (int) ((elapsedTime % 1f) * 1000f);
         String timeText = String.format("%02d:%02d:%03d", minutes, seconds, milliseconds);
 
         font.draw(batch, timeText, screenWidth - 150, screenHeight - PADDING_TOP);
+    }
+
+    private void drawWave(SpriteBatch batch, int currentWave, int maxWaves, float screenWidth, float screenHeight) {
+        String waveText = String.format("Wave %d / %d", currentWave, maxWaves);
+
+        font.draw(batch, waveText, screenWidth - 150, screenHeight - PADDING_TOP - 20f);
     }
 }

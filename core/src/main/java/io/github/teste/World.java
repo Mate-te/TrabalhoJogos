@@ -122,4 +122,6 @@ public class World {
     public Array<EnemyJF> getActiveEnemyJF() { return enemyManager.getActiveEnemyJF(); }
     public Hero getHero() { return hero; }
     public float getElapsedTime() { return elapsedTime; }
+    public int getCurrentWave() { return enemyManager.getCurrentWave(); }
+    public int getMaxWaves() { return enemyManager.getMaxWaves(); }
 }

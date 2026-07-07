@@ -8,6 +8,8 @@ public class EnemyJF extends GameEntity {
     private float mapWidth = 0f;
     private float mapHeight = 0f;
 
+    private float speed = 150f;
+
     // Animação (usa apenas a primeira linha da spritesheet)
     private TextureRegion[] frames;
     private float animationTimer = 0f;
@@ -50,6 +52,10 @@ public class EnemyJF extends GameEntity {
     public void setMapBounds(float width, float height) {
         this.mapWidth = width;
         this.mapHeight = height;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
     }
 
     public void takeDamage(int amount) {
