@@ -70,7 +70,7 @@ public class EnemyManager {
             // Progressão de Wave (exceto na última, que dura até matar o boss)
             if (waveTimer >= WAVE_DURATION && currentWave < MAX_WAVES) {
                 currentWave++;
-                waveTimer = 0f;
+                waveTimer -= WAVE_DURATION;
                 aliensSpawnedThisWave = 0;
                 jfSpawnedThisWave = 0;
             }
