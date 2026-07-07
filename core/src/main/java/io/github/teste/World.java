@@ -14,6 +14,13 @@ public class World {
             return new Bullet(bulletTexture);
         }
     };
+    private Texture burstBulletTexture;
+    private final Pool<Bullet> burstBulletPool = new Pool<Bullet>() {
+        @Override
+        protected Bullet newObject() {
+            return new Bullet(burstBulletTexture);
+        }
+    };
 
     private Hero hero;
     private EnemyManager enemyManager;
@@ -29,6 +36,7 @@ public class World {
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
         this.bulletTexture = Assets.manager.get(Assets.BULLET, Texture.class);
+        this.burstBulletTexture = Assets.manager.get(Assets.BULLET_BURST, Texture.class);
         Texture alienTexture = Assets.manager.get(Assets.ALIEN_SPRITESHEET, Texture.class);
         Texture enemyJFTexture = Assets.manager.get(Assets.ENEMY_JF_SPRITESHEET, Texture.class); // nova textura
 
@@ -49,7 +57,12 @@ public class World {
             bullet.update(delta);
             if (!bullet.isAlive()) {
                 activeBullets.removeIndex(i);
-                bulletPool.free(bullet);
+
+                if (bullet.getTexture() == burstBulletTexture) {
+                    burstBulletPool.free(bullet);
+                } else {
+                    bulletPool.free(bullet);
+                }
             }
         }
 
@@ -62,6 +75,18 @@ public class World {
         bullet.init(x, y, angleDeg);
         activeBullets.add(bullet);
 
+        if (Assets.manager.isLoaded(Assets.SOM_TIRO, com.badlogic.gdx.audio.Sound.class)) {
+            com.badlogic.gdx.audio.Sound s = Assets.manager.get(Assets.SOM_TIRO, com.badlogic.gdx.audio.Sound.class);
+            bullet.setSom(s);
+            if (s != null) s.play(0.3f);
+        }
+    }
+
+    public void shootBurst(float x, float y, float angleDeg) {
+        Bullet bullet = burstBulletPool.obtain();
+        bullet.setMapBounds(mapWidth, mapHeight);
+        bullet.init(x, y, angleDeg);
+        activeBullets.add(bullet);
         if (Assets.manager.isLoaded(Assets.SOM_TIRO, com.badlogic.gdx.audio.Sound.class)) {
             com.badlogic.gdx.audio.Sound s = Assets.manager.get(Assets.SOM_TIRO, com.badlogic.gdx.audio.Sound.class);
             bullet.setSom(s);

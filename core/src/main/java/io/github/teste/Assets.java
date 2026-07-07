@@ -15,6 +15,7 @@ public abstract class Assets {
     public static final String ALIEN = "demo.png";
     public static final String ALIEN_SPRITESHEET = "ufo_spritesheet.png";
     public static final String BULLET = "bullet.png";
+    public static final String BULLET_BURST = "bulletBurst.png";
     public static final String SOM_TIRO = "data/shoot.wav";
     public static final String SOM_MORTE = "data/morte.wav";
     public static final String MUSICA_FUNDO = "data/backgroundMusic.mp3";
@@ -34,6 +35,7 @@ public abstract class Assets {
         manager.load(ENEMY_JF_SPRITESHEET, Texture.class);
         manager.load(ALIEN_SPRITESHEET, Texture.class);
         manager.load(BULLET, Texture.class);
+        manager.load(BULLET_BURST, Texture.class);
         manager.load(DIALOG_BOX, Texture.class);
         manager.load(SOM_TIRO, Sound.class);
         manager.load(SOM_MORTE, Sound.class);

@@ -22,6 +22,8 @@ public class Hero extends GameEntity { // Changed to extend GameEntity
     private int score = 0;
     private int nextLifeThreshold = 100;
 
+    private WeaponType currentWeapon = WeaponType.DEFAULT;
+
     // World bounds (em pixels). Se 0, usa as dimensões da tela como fallback.
     private float worldWidth = 0f;
     private float worldHeight = 0f;
@@ -55,6 +57,7 @@ public class Hero extends GameEntity { // Changed to extend GameEntity
         velocityY = 0f;
         score = 0;
         nextLifeThreshold = 100;
+        currentWeapon = WeaponType.DEFAULT;
     }
 
     @Override
@@ -98,6 +101,10 @@ public class Hero extends GameEntity { // Changed to extend GameEntity
 
         // Atualiza as partículas
         fireEmitter.update(delta);
+
+        if (inputManager != null) {
+            inputManager.update(delta);
+        }
     }
 
     public void setWorldBounds(float width, float height) {
@@ -168,6 +175,14 @@ public class Hero extends GameEntity { // Changed to extend GameEntity
             }
             nextLifeThreshold += 100;
         }
+
+        if (this.score >= 500 && currentWeapon == WeaponType.DEFAULT) {
+            currentWeapon = WeaponType.BURST;
+        }
+    }
+
+    public WeaponType getWeapon() {
+        return currentWeapon;
     }
 
 }
