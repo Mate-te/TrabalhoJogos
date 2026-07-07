@@ -4,6 +4,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.audio.Music;
 
 public abstract class Assets {
     public static final AssetManager manager = new AssetManager();
@@ -14,8 +15,9 @@ public abstract class Assets {
     public static final String ALIEN = "demo.png";
     public static final String ALIEN_SPRITESHEET = "ufo_spritesheet.png";
     public static final String BULLET = "bullet.png";
-    public static final String SOM_TIRO = "data/PIU.wav";
+    public static final String SOM_TIRO = "data/shoot.wav";
     public static final String SOM_MORTE = "data/morte.wav";
+    public static final String MUSICA_FUNDO = "data/backgroundMusic.mp3";
     public static final String DIALOG_BOX = "dialogbox.png";
     public static final String MENU_BACKGROUND = "menu_background.jpeg"; // New background asset
     public static final String MAPA = "mapa.tmx";
@@ -35,6 +37,7 @@ public abstract class Assets {
         manager.load(DIALOG_BOX, Texture.class);
         manager.load(SOM_TIRO, Sound.class);
         manager.load(SOM_MORTE, Sound.class);
+        manager.load(MUSICA_FUNDO, com.badlogic.gdx.audio.Music.class);
         manager.setLoader(TiledMap.class,
             new com.badlogic.gdx.maps.tiled.TmxMapLoader(new com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver()));
         manager.load(MAPA, TiledMap.class);

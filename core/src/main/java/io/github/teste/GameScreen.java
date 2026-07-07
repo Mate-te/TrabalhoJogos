@@ -21,6 +21,7 @@ public class GameScreen implements Screen {
     private Texture alien;
     private Texture heroIMG;
     private Texture bullet;
+    private com.badlogic.gdx.audio.Music backgroundMusic;
     private World world;
     private Hero hero;
     private SpeechBubble speechBubble;
@@ -65,6 +66,11 @@ public class GameScreen implements Screen {
         heroIMG = Assets.manager.get(Assets.NAVE, Texture.class);
         bullet = Assets.manager.get(Assets.BULLET, Texture.class);
         Texture particleTexture = Assets.manager.get(Assets.PARTICLE, Texture.class);
+        backgroundMusic = Assets.manager.get(Assets.MUSICA_FUNDO, com.badlogic.gdx.audio.Music.class);
+
+        backgroundMusic.setLooping(true);
+        backgroundMusic.setVolume(0.8f);
+        backgroundMusic.play();
 
         com.badlogic.gdx.audio.Sound shootSound = Assets.manager.get(Assets.SOM_TIRO, com.badlogic.gdx.audio.Sound.class);
         com.badlogic.gdx.audio.Sound deathSound = Assets.manager.get(Assets.SOM_MORTE, com.badlogic.gdx.audio.Sound.class);
@@ -218,6 +224,9 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
+        if (backgroundMusic != null) {
+            backgroundMusic.stop();
+        }
         if (tmr != null) tmr.dispose();
         if (tiledMap != null) tiledMap.dispose();
         batch.dispose();

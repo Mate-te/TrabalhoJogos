@@ -65,7 +65,7 @@ public class World {
         if (Assets.manager.isLoaded(Assets.SOM_TIRO, com.badlogic.gdx.audio.Sound.class)) {
             com.badlogic.gdx.audio.Sound s = Assets.manager.get(Assets.SOM_TIRO, com.badlogic.gdx.audio.Sound.class);
             bullet.setSom(s);
-            if (s != null) s.play();
+            if (s != null) s.play(0.3f);
         }
     }
 
