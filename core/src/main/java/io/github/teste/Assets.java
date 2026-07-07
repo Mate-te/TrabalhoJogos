@@ -20,7 +20,8 @@ public abstract class Assets {
     public static final String SOM_MORTE = "data/morte.wav";
     public static final String MUSICA_FUNDO = "data/backgroundMusic.mp3";
     public static final String DIALOG_BOX = "dialogbox.png";
-    public static final String MENU_BACKGROUND = "menu_background.jpeg"; // New background asset
+    public static final String MENU_BACKGROUND = "backgroundMenuIniciar.png";
+    public static final String RETRY_BACKGROUND = "backgroundRetry.png";
     public static final String MAPA = "mapa.tmx";
     public static final String PARTICLE = "particles/particle.png";
     public static final String ENEMY_JF_SPRITESHEET = "jellyfish-large-Sheet.png"; // ou o nome do seu arquivo
@@ -43,8 +44,8 @@ public abstract class Assets {
         manager.setLoader(TiledMap.class,
             new com.badlogic.gdx.maps.tiled.TmxMapLoader(new com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver()));
         manager.load(MAPA, TiledMap.class);
-
         manager.load(MENU_BACKGROUND, Texture.class);
+        manager.load(RETRY_BACKGROUND, Texture.class);
         manager.load(PARTICLE, Texture.class);
         manager.load(HEART_FULL, Texture.class);
         manager.load(HEART_EMPTY, Texture.class);

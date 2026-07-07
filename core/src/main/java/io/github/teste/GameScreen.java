@@ -35,9 +35,12 @@ public class GameScreen implements Screen {
 
     private HUD hud;
 
+    private float deathTimer = 0f;
+
     // Dimensões do mapa (em pixels) - defina aqui o tamanho maior que a tela
     private final float mapWidthPx = 3000f;  // 3x a tela
     private final float mapHeightPx = 3000f; // 3x a tela
+
 
     public GameScreen(Game game) {
         this.game = game;
@@ -116,6 +119,19 @@ public class GameScreen implements Screen {
         // Atualiza a lógica do mundo físico do jogo
         world.update(delta);
         speechBubble.update(delta);
+
+        if (!hero.isAlive()) {
+            deathTimer += delta;
+
+            // Aguarda 3 segundos antes de mudar de tela
+            if (deathTimer >= 3f) {
+                int finalScore = hero.getScore();
+                game.setScreen(new GameOverScreen((Main) game, finalScore));
+                dispose();
+                return; // Impede que o restante do render() tente desenhar objetos destruídos
+            }
+        }
+
         if (speechBubble.isVisible()) {
             float heroX = hero.getX() + hero.getWidth() / 2f;
             float heroY = hero.getY() + hero.getHeight() / 2f;
